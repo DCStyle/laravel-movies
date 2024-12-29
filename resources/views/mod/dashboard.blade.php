@@ -59,7 +59,7 @@
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Hành động nhanh</h3>
                 <div class="flex flex-wrap gap-4">
-                    <a href="{{ route('mod.movies.create') }}"
+                    <a href="{{ route('movies.management.create') }}"
                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -75,7 +75,7 @@
             <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Phim gần đây</h3>
-                    <a href="{{ route('mod.movies.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Xem tất cả</a>
+                    <a href="{{ route('movies.management.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">Xem tất cả</a>
                 </div>
             </div>
             <div class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -131,7 +131,7 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Chưa có phim nào</h3>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Bắt đầu bằng cách thêm phim đầu tiên của bạn.</p>
                         <div class="mt-6">
-                            <a href="{{ route('mod.movies.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            <a href="{{ route('movies.management.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                 </svg>
