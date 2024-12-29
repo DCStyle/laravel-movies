@@ -1,4 +1,8 @@
-@extends('layouts.admin')
+@php
+    $extends = auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator';
+@endphp
+
+@extends($extends)
 
 @section('title', $isEdit ? 'Chỉnh sửa phim: ' . $movie->title : 'Thêm phim mới')
 @section('header', $isEdit ? 'Chỉnh sửa phim: ' . $movie->title : 'Thêm phim mới')
