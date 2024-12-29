@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__.'/auth.php';
+
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -116,5 +118,3 @@ Route::post('images/upload', [ImageController::class, 'store'])->name('images.up
 // API Routes
 Route::get('/api/search', [MovieController::class, 'search']);
 Route::get('/api/movies/sources/{sourceId}', [MovieController::class, 'getSource']);
-
-require __DIR__.'/auth.php';
