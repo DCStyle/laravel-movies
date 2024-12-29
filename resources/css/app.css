@@ -1,0 +1,44 @@
+@import "fontawesome.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Latest Movies Slider */
+.latest-movies-slider .swiper-pagination {
+    position: static;
+    margin-top: 10px;
+}
+
+.latest-movies-slider .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: width 0.3s, height 0.3s, background 0.3s;
+}
+
+.latest-movies-slider .swiper-pagination-bullet-active {
+    width: 40px;
+    border-radius: 8px;
+    background: #fff;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(30,30,30,.9);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75,75,75,.9);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(100,100,100,.9);
+}
