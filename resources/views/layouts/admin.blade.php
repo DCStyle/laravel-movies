@@ -63,9 +63,21 @@
                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.menus.*') ? 'bg-gray-700' : '' }}">
                 <i class="fas fa-bars mr-2"></i> Menu
             </a>
+            <a href="{{ route('admin.pages.index') }}"
+               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.pages.*') ? 'bg-gray-700' : '' }}">
+                <i class="fas fa-pager mr-2"></i> Các trang
+            </a>
+            <a href="{{ route('admin.ads.index') }}"
+               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.ads.*') ? 'bg-gray-700' : '' }}">
+                <i class="fas fa-ad mr-2"></i> Quảng cáo
+            </a>
+            <a href="{{ route('admin.movie-ads.index') }}"
+               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.movie-ads.*') ? 'bg-gray-700' : '' }}">
+                <i class="fas fa-tachometer-alt-average mr-2"></i> Quảng cáo trong phim
+            </a>
             <a href="{{ route('admin.footer.index') }}"
                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.footer.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-bars mr-2"></i> Footer
+                <i class="fas fa-th-large mr-2"></i> Footer
             </a>
 
             <!-- Logout Form -->

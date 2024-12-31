@@ -2,12 +2,15 @@
 
 require __DIR__.'/auth.php';
 
+use App\Http\Controllers\Admin\AdController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\MovieAdController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CountryController;
@@ -77,6 +80,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('menus', MenuController::class)->except(['show']);
     Route::post('menus/reorder', [MenuController::class, 'reorder'])->name('menus.reorder');
 
+    // Pages Management
+    Route::resource('pages', PageController::class)->except(['show']);
+
+    // Ads Management
+    Route::resource('ads', AdController::class)->except(['show']);
+    Route::post('ads/reorder', [AdController::class, 'reorder'])->name('ads.reorder');
+
+    // Movie Ads Management
+    Route::resource('movie-ads', MovieAdController::class);
+    Route::post('movie-ads/{movieAd}/toggle-status', [MovieAdController::class, 'toggleStatus'])
+        ->name('movie-ads.toggle-status');
+    Route::post('movie-ads/update-order', [MovieAdController::class, 'updateOrder'])
+        ->name('movie-ads.update-order');
+
     // Footer Management
     Route::prefix('footer')->controller(FooterController::class)->name('footer.')->group(function () {
         Route::get('/', 'index')->name('index');
@@ -104,7 +121,7 @@ Route::middleware(['auth', 'role:mod'])->prefix('mod')->name('mod.')->group(func
 
 // Public Routes
 Route::get('/', [MovieController::class, 'index'])->name('home');
-Route::get('/{category:slug}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+Route::get('/{slug}', [App\Http\Controllers\IndexController::class, 'show'])->name('index.show');
 Route::get('/phim/{movie:slug}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/tim-kiem', [MovieController::class, 'search'])->name('movies.search');
 Route::get('/the-loai/{genre:slug}', [App\Http\Controllers\GenreController::class, 'show'])->name('genres.show');
@@ -113,8 +130,5 @@ Route::get('/nam-phat-hanh/{year}', [App\Http\Controllers\ReleaseYearController:
 Route::get('/tin-tuc', [App\Http\Controllers\ArticleController::class, 'index'])->name('articles.index');
 Route::get('/tin-tuc/{article:slug}', [App\Http\Controllers\ArticleController::class, 'show'])->name('articles.show');
 
-Route::post('images/upload', [ImageController::class, 'store'])->name('images.upload');
-
 // API Routes
-Route::get('/api/search', [MovieController::class, 'search']);
-Route::get('/api/movies/sources/{sourceId}', [MovieController::class, 'getSource']);
+Route::post('images/upload', [ImageController::class, 'store'])->name('images.upload');

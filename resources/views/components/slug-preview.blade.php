@@ -1,7 +1,11 @@
 <div class="mt-6 bg-white rounded-lg shadow-sm p-6">
     <h3 class="text-lg font-medium text-gray-900 mb-4">Xem trước URL</h3>
     <div class="p-4 {{ $getSlugPreviewClass() }} rounded text-sm font-mono text-gray-600">
-        {{ url('/') }}/{{ $nameId }}/<span id="{{ $slugId }}">{{ $getSlug() }}</span>
+        @isset($nameId)
+            {{ url('/') }}/{{ $nameId }}/<span id="{{ $slugId }}">{{ $getSlug() }}</span>
+        @else
+            {{ url('/') }}/<span id="{{ $slugId }}">{{ $getSlug() }}</span>
+        @endisset
     </div>
 </div>
 

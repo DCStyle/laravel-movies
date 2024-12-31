@@ -7,6 +7,8 @@
 @section('content')
     <x-movie-list-hero-slider :latestMovies="$latestMovies" />
 
+    <x-page-hero-header :title="setting('site_name')" />
+
     <x-movie-list-horizontal title="Phim mới nổi bật" :movies="$highlightedMovies" />
 
     <x-movie-list-horizontal title="Phim chiếu rạp mới cập nhật" :movies="$theatersMovies" />
@@ -20,8 +22,6 @@
             <h2 class="text-white text-xl font-medium">
                 <span class="border-l-4 border-blue-500 pl-2">Tin tức</span>
             </h2>
-
-{{--            <a href="{{ route('articles.index') }}" class="text-blue-600">Xem thêm</a>--}}
         </div>
 
         <div class="space-y-6">

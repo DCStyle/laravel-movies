@@ -30,6 +30,12 @@
 
 <!-- Main Content -->
 <div class="container min-h-screen mx-auto px-4 py-8 bg-[rgba(15,15,15,.9)]">
+    @foreach(app(\App\Services\AdService::class)->getAds('header') as $ad)
+        <div class="ad-container mb-4">
+            {!! $ad->content !!}
+        </div>
+    @endforeach
+
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Main Column -->
         <div class="flex-1 min-w-0">
@@ -41,6 +47,12 @@
             <div class="lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] overflow-hidden">
                 <div class="h-full overflow-y-auto custom-scrollbar space-y-4">
                     @include('includes.sidebar')
+
+                    @foreach(app(\App\Services\AdService::class)->getAds('footer') as $ad)
+                        <div class="ad-container mt-4">
+                            {!! $ad->content !!}
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </aside>
@@ -49,6 +61,12 @@
 
 <!-- Footer -->
 <footer class="container mx-auto bg-[rgba(15,15,15,.9)] shadow-2xl mb-12">
+    @foreach(app(\App\Services\AdService::class)->getAds('footer') as $ad)
+        <div class="ad-container mb-4">
+            {!! $ad->content !!}
+        </div>
+    @endforeach
+
     @include('includes.footer')
 </footer>
 
@@ -58,10 +76,12 @@
 
 <script>
 	window.fbAsyncInit = function() {
-		FB.init({
-			xfbml: true,
-			version: 'v3.2'
-		});
+		if (window.FB) {
+			FB.init({
+				xfbml: true,
+				version: 'v3.2'
+			});
+		}
 	};
 </script>
 <div id="fb-root"></div>

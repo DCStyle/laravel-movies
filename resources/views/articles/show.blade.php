@@ -24,9 +24,9 @@
                     {{ $article->created_at->format('d/m/Y') }}
                 </time>
                 <span>
-               <i class="fas fa-eye mr-2"></i>
-               {{ number_format($article->views) }} lượt xem
-           </span>
+                    <i class="fas fa-eye mr-2"></i>
+                    {{ number_format($article->views) }} lượt xem
+                </span>
             </div>
         </header>
 

@@ -87,8 +87,8 @@ class Movie extends Model
     public function getDynamicSEOData(): SEOData
     {
         return new SEOData(
-            title: $this->title,
-            description: $this->description,
+            title: $this->meta_title && $this->meta_title !== '' ? $this->meta_title : $this->title,
+            description: $this->meta_description && $this->meta_description !== '' ? $this->meta_description : $this->description,
             image: Storage::url($this->thumbnail),
             tags: explode(',', $this->meta_keywords)
         );
