@@ -2,108 +2,92 @@
 
 <div class="w-full h-full">
 	@if($source && $source->source_url && $source->source_type)
-		@switch(strtolower($source->source_type))
-			@case('youtube')
-				@php
-					$videoId = '';
-                    $patterns = [
-                        '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/',
-                        '/^([^"&?\/\s]{11})$/'
-                    ];
+		<div id="player-{{ $source->id }}"
+			 class="video-container relative w-full h-full bg-black"
+			 data-source-type="{{ $source->source_type }}">
 
-                    foreach ($patterns as $pattern) {
-                        if (preg_match($pattern, $source->source_url, $match)) {
-                            $videoId = $match[1];
-                            break;
+			@switch(strtolower($source->source_type))
+				@case('youtube')
+					@php
+						$videoId = '';
+                        $patterns = [
+                            '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/',
+                            '/^([^"&?\/\s]{11})$/'
+                        ];
+
+                        foreach ($patterns as $pattern) {
+                            if (preg_match($pattern, $source->source_url, $match)) {
+                                $videoId = $match[1];
+                                break;
+                            }
                         }
-                    }
-				@endphp
+					@endphp
 
-				@if($videoId)
-					<div id="player-{{ $source->id }}"
-						 data-plyr-provider="youtube"
-						 data-plyr-embed-id="{{ $videoId }}"
-						 data-source-type="youtube"
-						 class="w-full h-full">
-					</div>
-				@endif
-				@break
+					@if($videoId)
+						<div class="youtube-embed w-full h-full"
+							 data-plyr-provider="youtube"
+							 data-plyr-embed-id="{{ $videoId }}">
+						</div>
+					@endif
+					@break
 
-			@case('direct')
-				<div id="player-{{ $source->id }}"
-					 class="video-container relative w-full h-full bg-black"
-					 data-source-type="direct">
-					<video
-							class="player-main w-full h-full"
-							playsinline
-							crossorigin="anonymous">
+				@case('direct')
+					<video class="player-main w-full h-full"
+						   playsinline
+						   crossorigin="anonymous">
 						<source src="{{ $source->source_url }}" type="video/mp4" />
-						Your browser doesn't support HTML5 video.
 					</video>
+					@break
 
-					<!-- Overlay Container (formerly ad container) -->
-					<div class="overlay-container absolute inset-0 bg-black/90 hidden z-50">
-						<div class="overlay-content relative w-full h-full flex items-center justify-center">
-							<!-- Content will be dynamically inserted here -->
-						</div>
-						<div class="overlay-controls absolute bottom-4 right-4 hidden">
-							<button type="button"
-									class="skip-overlay-button px-4 py-2 bg-blue-600 text-white rounded-lg opacity-50 cursor-not-allowed"
-									disabled>
-								Continue in <span class="timer">5</span>
-							</button>
-						</div>
+				@case('google drive')
+					@php
+						$embedUrl = $source->source_url;
+                        if (preg_match('/\/file\/d\/([^\/]+)/', $source->source_url, $matches)) {
+                            $fileId = $matches[1];
+                            $embedUrl = "https://drive.google.com/file/d/" . e($fileId) . "/preview";
+                        }
+					@endphp
+					<iframe src="{{ $embedUrl }}"
+							class="w-full h-full"
+							allowfullscreen
+							allow="autoplay"
+							loading="lazy"
+							referrerpolicy="no-referrer"
+							sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+					</iframe>
+					@break
+
+				@case('facebook')
+					<div class="fb-video w-full h-full"
+						 data-href="{{ e($source->source_url) }}"
+						 data-width="auto"
+						 data-allowfullscreen="true"
+						 data-autoplay="false"
+						 data-show-text="false"
+						 data-show-captions="false">
 					</div>
-				</div>
-				@break
+					@break
 
-			@case('google drive')
-				@php
-					$embedUrl = $source->source_url;
-                    if (preg_match('/\/file\/d\/([^\/]+)/', $source->source_url, $matches)) {
-                        $fileId = $matches[1];
-                        $embedUrl = "https://drive.google.com/file/d/" . e($fileId) . "/preview";
-                    }
-				@endphp
-				<iframe
-						src="{{ $embedUrl }}"
-						class="w-full h-full"
-						allowfullscreen
-						allow="autoplay"
-						loading="lazy"
-						referrerpolicy="no-referrer"
-						sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-				></iframe>
-				@break
-
-			@case('facebook')
-				<div class="w-full h-full" id="fb-video-container-{{ $source->id }}">
-					<div
-							class="fb-video"
-							data-href="{{ e($source->source_url) }}"
-							data-width="auto"
-							data-allowfullscreen="true"
-							data-autoplay="false"
-							data-show-text="false"
-							data-show-captions="false">
+				@default
+					<div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-400">
+						<p>Unsupported video source type: {{ e($source->source_type) }}</p>
 					</div>
-				</div>
-				<script>
-					document.addEventListener('DOMContentLoaded', function() {
-						if (window.FB) {
-							FB.XFBML.parse(document.getElementById('fb-video-container-{{ $source->id }}'));
-						} else {
-							console.warn('Facebook SDK not loaded');
-						}
-					});
-				</script>
-				@break
+			@endswitch
 
-			@default
-				<div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-400">
-					<p>Unsupported video source type: {{ e($source->source_type) }}</p>
+			<!-- Overlay Container (for all source types) -->
+			<div class="overlay-container absolute inset-0 bg-black/90 hidden z-50">
+				<div class="overlay-content relative w-full h-full flex items-center justify-center">
+					<!-- Content will be dynamically inserted here -->
 				</div>
-		@endswitch
+				<div class="overlay-controls absolute bottom-4 right-4 hidden">
+					<button type="button"
+							class="skip-overlay-button px-4 py-2 bg-blue-600 text-white rounded-lg opacity-50 cursor-not-allowed"
+							disabled>
+						Continue in <span class="timer">5</span>
+					</button>
+				</div>
+			</div>
+		</div>
 	@else
 		<div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-400">
 			<p>No video source available</p>
@@ -123,29 +107,6 @@
 				height: 100%;
 			}
 
-			.plyr--video .plyr__control--overlaid {
-				background: rgba(0, 0, 0, 0.75);
-			}
-
-			.plyr--video .plyr__control--overlaid:hover {
-				background: rgb(0, 0, 0);
-			}
-
-			.plyr--full-ui input[type=range] {
-				color: #3b82f6;
-			}
-
-			.plyr__control.plyr__tab-focus,
-			.plyr__control:hover,
-			.plyr__control[aria-expanded=true] {
-				background: #3b82f6;
-			}
-
-			.plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]::before {
-				background: #3b82f6;
-			}
-
-			/* Overlay Styles */
 			.overlay-container {
 				transition: opacity 0.3s ease-in-out;
 			}
@@ -167,14 +128,7 @@
 				background-color: #2563eb;
 			}
 
-			/* Content Styles */
-			.video-content {
-				width: 100%;
-				height: 100%;
-				object-fit: contain;
-			}
-
-			.image-content {
+			.video-content, .image-content {
 				max-width: 100%;
 				max-height: 100%;
 				object-fit: contain;
@@ -209,27 +163,83 @@
 				}
 
 				setupEventListeners() {
-					this.player.on('timeupdate', () => this.checkForOverlays());
-
-					this.player.on('seeked', () => {
-						const currentTime = (this.player.currentTime / this.player.duration) * 100;
-						this.shownOverlays.forEach(overlayId => {
-							const overlay = this.shownOverlays.get(overlayId);
-							if (overlay && overlay.display_time > currentTime) {
-								this.shownOverlays.delete(overlayId);
+					if (this.player.on) {
+						// For Plyr players
+						this.player.on('timeupdate', () => this.checkForOverlays());
+						this.player.on('seeked', () => this.handleSeek());
+					} else if (this.player instanceof HTMLVideoElement) {
+						// For native video element
+						this.player.addEventListener('timeupdate', () => this.checkForOverlays());
+						this.player.addEventListener('seeked', () => this.handleSeek());
+					} else if (this.player.getPlayerState) {
+						// For YouTube iframe API
+						setInterval(() => this.checkForOverlays(), 1000);
+						this.player.addEventListener('onStateChange', (event) => {
+							if (event.data === YT.PlayerState.SEEKING) {
+								this.handleSeek();
 							}
 						});
-					});
+					}
 
 					if (this.skipButton) {
 						this.skipButton.addEventListener('click', () => this.skipOverlay());
 					}
 				}
 
-				async checkForOverlays() {
-					if (this.currentOverlay || !this.player.playing) return;
+				handleSeek() {
+					const currentTime = this.getCurrentTime();
+					this.shownOverlays.forEach(overlayId => {
+						const overlay = this.shownOverlays.get(overlayId);
+						if (overlay && overlay.display_time > currentTime) {
+							this.shownOverlays.delete(overlayId);
+						}
+					});
+				}
 
-					const currentTime = (this.player.currentTime / this.player.duration) * 100;
+				getCurrentTime() {
+					if (this.player.currentTime !== undefined) {
+						// Plyr or native video
+						const duration = this.player.duration || 0;
+						return duration ? (this.player.currentTime / duration) * 100 : 0;
+					} else if (this.player.getCurrentTime) {
+						// YouTube
+						const duration = this.player.getDuration() || 0;
+						return duration ? (this.player.getCurrentTime() / duration) * 100 : 0;
+					}
+					return 0;
+				}
+
+				isPlaying() {
+					if (this.player.playing !== undefined) {
+						return this.player.playing;
+					} else if (this.player.getPlayerState) {
+						return this.player.getPlayerState() === YT.PlayerState.PLAYING;
+					} else if (this.player instanceof HTMLVideoElement) {
+						return !this.player.paused;
+					}
+					return false;
+				}
+
+				pauseVideo() {
+					if (this.player.pause) {
+						this.player.pause();
+					} else if (this.player.pauseVideo) {
+						this.player.pauseVideo();
+					}
+				}
+
+				playVideo() {
+					if (this.player.play) {
+						this.player.play();
+					} else if (this.player.playVideo) {
+						this.player.playVideo();
+					}
+				}
+
+				async checkForOverlays() {
+					if (this.currentOverlay || !this.isPlaying()) return;
+
+					const currentTime = this.getCurrentTime();
 
 					try {
 						const response = await fetch(`/api/movie-breaks/next?time=${currentTime}&shown=${Array.from(this.shownOverlays).join(',')}`);
@@ -246,7 +256,7 @@
 				}
 
 				showOverlay(overlay) {
-					this.player.pause();
+					this.pauseVideo();
 					this.overlayContent.innerHTML = '';
 
 					if (overlay.type === 'image') {
@@ -325,7 +335,7 @@
 							this.timerSpan = this.skipButton.querySelector('.timer');
 						}
 
-						this.player.play();
+						this.playVideo();
 					}, 300);
 
 					this.currentOverlay = null;
@@ -344,14 +354,8 @@
 
 				const options = {
 					controls: [
-						'play-large',
-						'play',
-						'progress',
-						'current-time',
-						'mute',
-						'volume',
-						'settings',
-						'fullscreen'
+						'play-large', 'play', 'progress', 'current-time',
+						'mute', 'volume', 'settings', 'fullscreen'
 					],
 					youtube: {
 						noCookie: true,
@@ -367,16 +371,31 @@
 				};
 
 				const sourceType = container.dataset.sourceType;
-				if (sourceType === 'youtube') {
-					currentPlayer = new Plyr(container, options);
-				} else if (sourceType === 'direct') {
-					const video = container.querySelector('video');
-					if (video) {
-						currentPlayer = new Plyr(video, options);
-					}
+				let playerElement = null;
+
+				switch (sourceType) {
+					case 'youtube':
+						playerElement = container.querySelector('.youtube-embed');
+						break;
+					case 'direct':
+						playerElement = container.querySelector('video');
+						break;
+					case 'facebook':
+						if (window.FB) {
+							FB.XFBML.parse(container);
+							// Facebook videos don't support our overlay system
+							return;
+						}
+						break;
 				}
 
-				if (currentPlayer) {
+				if (playerElement) {
+					currentPlayer = new Plyr(playerElement, options);
+
+					currentPlayer.on('ready', () => {
+						container.classList.add('plyr--initialized');
+					});
+
 					currentPlayer.on('enterfullscreen', () => {
 						container.classList.add('plyr--full');
 					});
@@ -385,10 +404,8 @@
 						container.classList.remove('plyr--full');
 					});
 
-					// Initialize overlay manager for direct videos
-					if (sourceType === 'direct') {
-						new VideoOverlayManager(currentPlayer, container);
-					}
+					// Initialize overlay manager for all supported players
+					new VideoOverlayManager(currentPlayer, container);
 				}
 
 				return currentPlayer;
@@ -400,7 +417,96 @@
 				if (container) {
 					initializePlayer('player-{{ $source->id }}');
 				}
+
+				// Initialize Facebook SDK if needed
+				if (container?.querySelector('.fb-video')) {
+					if (!window.FB) {
+						// Load Facebook SDK
+						const script = document.createElement('script');
+						script.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0";
+						script.async = true;
+						script.defer = true;
+						script.crossOrigin = "anonymous";
+						document.body.appendChild(script);
+					}
+				}
+
+				// Load YouTube API if needed
+				if (container?.querySelector('.youtube-embed')) {
+					if (!window.YT) {
+						const tag = document.createElement('script');
+						tag.src = "https://www.youtube.com/iframe_api";
+						const firstScriptTag = document.getElementsByTagName('script')[0];
+						firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+					}
+				}
 			});
+
+			// Function to handle source changes
+			window.changeSource = async function(sourceId) {
+				const playerContainer = document.getElementById('player-container');
+				if (!playerContainer) return;
+
+				try {
+					// Show loading state
+					playerContainer.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center bg-black/90">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                        </div>
+                    `;
+
+					// Fetch new player HTML
+					const response = await fetch(`/api/movies/sources/${sourceId}`);
+					if (!response.ok) throw new Error('Failed to fetch source');
+
+					const data = await response.json();
+
+					// Update player container
+					playerContainer.innerHTML = data.player_html;
+
+					// Initialize new player
+					const newPlayerContainer = playerContainer.querySelector('[id^="player-"]');
+					if (newPlayerContainer) {
+						initializePlayer(newPlayerContainer.id);
+					}
+
+					// Update button states
+					document.querySelectorAll('[data-source-id]').forEach(button => {
+						const isActive = button.dataset.sourceId === sourceId;
+						button.classList.toggle('bg-blue-500', isActive);
+						button.classList.toggle('text-white', isActive);
+						button.classList.toggle('bg-gray-700', !isActive);
+						button.classList.toggle('text-gray-300', !isActive);
+						button.setAttribute('aria-pressed', isActive.toString());
+					});
+
+				} catch (error) {
+					console.error('Error changing source:', error);
+					showErrorMessage(sourceId);
+				}
+			};
+
+			function showErrorMessage(sourceId) {
+				const playerContainer = document.getElementById('player-container');
+				if (!playerContainer) return;
+
+				playerContainer.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-black/90">
+                        <div class="text-center p-6">
+                            <div class="w-16 h-16 rounded-full bg-gray-800/50 mx-auto flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <p class="text-gray-400 mb-4">Không thể tải nguồn phim</p>
+                            <button onclick="changeSource('${sourceId}')"
+                                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200">
+                                Thử lại
+                            </button>
+                        </div>
+                    </div>
+                `;
+			}
 		</script>
 	@endpush
 @endonce
