@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class MovieAdController extends Controller
 {
-    public function getNextAd(Request $request)
+    public function getNext(Request $request)
     {
         $currentTime = $request->query('time', 0);
         $shownAds = array_filter(explode(',', $request->query('shown', '')));
@@ -28,7 +28,7 @@ class MovieAdController extends Controller
             $ad->update(['last_shown_at' => now()]);
 
             return response()->json([
-                'ad' => [
+                'overlay' => [
                     'id' => $ad->id,
                     'type' => $ad->type,
                     'content_url' => $ad->content_url,

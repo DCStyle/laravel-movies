@@ -41,16 +41,16 @@
 						Your browser doesn't support HTML5 video.
 					</video>
 
-					<!-- Ad Container -->
-					<div class="ad-container absolute inset-0 bg-black/90 hidden z-50">
-						<div class="ad-content relative w-full h-full flex items-center justify-center">
-							<!-- Ad content will be dynamically inserted here -->
+					<!-- Overlay Container (formerly ad container) -->
+					<div class="overlay-container absolute inset-0 bg-black/90 hidden z-50">
+						<div class="overlay-content relative w-full h-full flex items-center justify-center">
+							<!-- Content will be dynamically inserted here -->
 						</div>
-						<div class="ad-controls absolute bottom-4 right-4 hidden">
+						<div class="overlay-controls absolute bottom-4 right-4 hidden">
 							<button type="button"
-									class="skip-ad-button px-4 py-2 bg-blue-600 text-white rounded-lg opacity-50 cursor-not-allowed"
+									class="skip-overlay-button px-4 py-2 bg-blue-600 text-white rounded-lg opacity-50 cursor-not-allowed"
 									disabled>
-								Skip Ad in <span class="countdown">5</span>
+								Continue in <span class="timer">5</span>
 							</button>
 						</div>
 					</div>
@@ -145,43 +145,42 @@
 				background: #3b82f6;
 			}
 
-			/* Ad Container Styles */
-			.ad-container {
+			/* Overlay Styles */
+			.overlay-container {
 				transition: opacity 0.3s ease-in-out;
 			}
 
-			.ad-container.hiding {
+			.overlay-container.hiding {
 				opacity: 0;
 			}
 
-			.skip-ad-button {
+			.skip-overlay-button {
 				transition: all 0.3s ease-in-out;
 			}
 
-			.skip-ad-button:not(:disabled) {
+			.skip-overlay-button:not(:disabled) {
 				opacity: 1;
 				cursor: pointer;
 			}
 
-			.skip-ad-button:not(:disabled):hover {
+			.skip-overlay-button:not(:disabled):hover {
 				background-color: #2563eb;
 			}
 
-			/* Video Ad Styles */
-			.video-ad {
+			/* Content Styles */
+			.video-content {
 				width: 100%;
 				height: 100%;
 				object-fit: contain;
 			}
 
-			/* Image Ad Styles */
-			.image-ad {
+			.image-content {
 				max-width: 100%;
 				max-height: 100%;
 				object-fit: contain;
 			}
 
-			.image-ad.clickable {
+			.image-content.clickable {
 				cursor: pointer;
 			}
 		</style>
@@ -190,123 +189,111 @@
 	@push('scripts')
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.polyfilled.js"></script>
 		<script>
-			class VideoAdManager {
+			let currentPlayer = null;
+
+			class VideoOverlayManager {
 				constructor(player, container) {
 					this.player = player;
 					this.container = container;
-					this.adContainer = container.querySelector('.ad-container');
-					this.adContent = this.adContainer.querySelector('.ad-content');
-					this.adControls = this.adContainer.querySelector('.ad-controls');
-					this.skipButton = this.adControls?.querySelector('.skip-ad-button');
-					this.countdownSpan = this.skipButton?.querySelector('.countdown');
-					this.currentAd = null;
+					this.overlayContainer = container.querySelector('.overlay-container');
+					this.overlayContent = this.overlayContainer.querySelector('.overlay-content');
+					this.overlayControls = this.overlayContainer.querySelector('.overlay-controls');
+					this.skipButton = this.overlayControls?.querySelector('.skip-overlay-button');
+					this.timerSpan = this.skipButton?.querySelector('.timer');
+					this.currentOverlay = null;
 					this.skipTimeout = null;
 					this.countdownInterval = null;
-					this.shownAds = new Set(); // Track shown ads for this session
+					this.shownOverlays = new Set();
 
 					this.setupEventListeners();
 				}
 
 				setupEventListeners() {
-					// Listen for timeupdate event
-					this.player.on('timeupdate', () => this.checkForAds());
+					this.player.on('timeupdate', () => this.checkForOverlays());
 
-					// Reset shown ads when video is seeked
 					this.player.on('seeked', () => {
 						const currentTime = (this.player.currentTime / this.player.duration) * 100;
-						// Only reset ads that should appear after the current position
-						this.shownAds.forEach(adId => {
-							const ad = this.shownAds.get(adId);
-							if (ad && ad.display_time > currentTime) {
-								this.shownAds.delete(adId);
+						this.shownOverlays.forEach(overlayId => {
+							const overlay = this.shownOverlays.get(overlayId);
+							if (overlay && overlay.display_time > currentTime) {
+								this.shownOverlays.delete(overlayId);
 							}
 						});
 					});
 
-					// Handle skip button clicks
 					if (this.skipButton) {
-						this.skipButton.addEventListener('click', () => this.skipAd());
+						this.skipButton.addEventListener('click', () => this.skipOverlay());
 					}
 				}
 
-				async checkForAds() {
-					if (this.currentAd || !this.player.playing) return;
+				async checkForOverlays() {
+					if (this.currentOverlay || !this.player.playing) return;
 
 					const currentTime = (this.player.currentTime / this.player.duration) * 100;
 
 					try {
-						const response = await fetch(`/api/movie-ads/next?time=${currentTime}&shown=${Array.from(this.shownAds).join(',')}`);
+						const response = await fetch(`/api/movie-breaks/next?time=${currentTime}&shown=${Array.from(this.shownOverlays).join(',')}`);
 						const data = await response.json();
 
-						if (data.ad && !this.shownAds.has(data.ad.id)) {
-							this.currentAd = data.ad;
-							this.showAd(data.ad);
-							this.shownAds.add(data.ad.id); // Mark this ad as shown
+						if (data.overlay && !this.shownOverlays.has(data.overlay.id)) {
+							this.currentOverlay = data.overlay;
+							this.showOverlay(data.overlay);
+							this.shownOverlays.add(data.overlay.id);
 						}
 					} catch (error) {
-						console.error('Error checking for ads:', error);
+						console.error('Error checking for overlays:', error);
 					}
 				}
 
-				showAd(ad) {
-					// Pause the main video
+				showOverlay(overlay) {
 					this.player.pause();
+					this.overlayContent.innerHTML = '';
 
-					// Clear previous content
-					this.adContent.innerHTML = '';
-
-					// Create ad element based on type
-					if (ad.type === 'image') {
+					if (overlay.type === 'image') {
 						const img = document.createElement('img');
-						img.src = ad.content_url;
-						img.className = 'image-ad ' + (ad.click_url ? 'clickable' : '');
+						img.src = overlay.content_url;
+						img.className = 'image-content ' + (overlay.click_url ? 'clickable' : '');
 
-						if (ad.click_url) {
-							img.addEventListener('click', () => window.open(ad.click_url, '_blank'));
+						if (overlay.click_url) {
+							img.addEventListener('click', () => window.open(overlay.click_url, '_blank'));
 						}
 
-						this.adContent.appendChild(img);
-
-						// Show skip button after duration
-						this.startSkipTimer(ad.duration);
-					} else if (ad.type === 'video') {
+						this.overlayContent.appendChild(img);
+						this.startSkipTimer(overlay.duration);
+					} else if (overlay.type === 'video') {
 						const video = document.createElement('video');
-						video.src = ad.content_url;
-						video.className = 'video-ad';
+						video.src = overlay.content_url;
+						video.className = 'video-content';
 						video.controls = false;
 						video.autoplay = true;
 
-						video.addEventListener('ended', () => this.skipAd());
-						if (ad.click_url) {
-							video.addEventListener('click', () => window.open(ad.click_url, '_blank'));
+						video.addEventListener('ended', () => this.skipOverlay());
+						if (overlay.click_url) {
+							video.addEventListener('click', () => window.open(overlay.click_url, '_blank'));
 							video.style.cursor = 'pointer';
 						}
 
-						this.adContent.appendChild(video);
+						this.overlayContent.appendChild(video);
 					}
 
-					// Show ad container
-					this.adContainer.classList.remove('hidden');
+					this.overlayContainer.classList.remove('hidden');
 				}
 
 				startSkipTimer(duration) {
 					let timeLeft = duration;
 
-					// Show controls for image ads
-					this.adControls.classList.remove('hidden');
+					this.overlayControls.classList.remove('hidden');
 
-					// Reset button state
 					if (this.skipButton) {
 						this.skipButton.disabled = true;
 						this.skipButton.classList.add('opacity-50', 'cursor-not-allowed');
 						this.skipButton.classList.remove('hover:bg-blue-700');
 					}
 
-					// Update countdown
 					this.countdownInterval = setInterval(() => {
 						timeLeft--;
-						if (this.countdownSpan) {
-							this.countdownSpan.textContent = timeLeft;
+						if (this.timerSpan) {
+							this.timerSpan.textContent = timeLeft;
 						}
 
 						if (timeLeft <= 0) {
@@ -315,46 +302,38 @@
 								this.skipButton.disabled = false;
 								this.skipButton.classList.remove('opacity-50', 'cursor-not-allowed');
 								this.skipButton.classList.add('hover:bg-blue-700');
-								this.skipButton.textContent = 'Skip Ad';
+								this.skipButton.textContent = 'Continue';
 							}
 						}
 					}, 1000);
 				}
 
-				skipAd() {
-					// Clear timers
+				skipOverlay() {
 					if (this.skipTimeout) clearTimeout(this.skipTimeout);
 					if (this.countdownInterval) clearInterval(this.countdownInterval);
 
-					// Hide ad container with animation
-					this.adContainer.classList.add('hiding');
+					this.overlayContainer.classList.add('hiding');
 
 					setTimeout(() => {
-						this.adContainer.classList.remove('hiding');
-						this.adContainer.classList.add('hidden');
-						this.adContent.innerHTML = '';
-						this.adControls.classList.add('hidden');
+						this.overlayContainer.classList.remove('hiding');
+						this.overlayContainer.classList.add('hidden');
+						this.overlayContent.innerHTML = '';
+						this.overlayControls.classList.add('hidden');
 
-						// Reset skip button
 						if (this.skipButton) {
-							this.skipButton.textContent = 'Skip Ad in <span class="countdown">5</span>';
-							this.countdownSpan = this.skipButton.querySelector('.countdown');
+							this.skipButton.textContent = 'Continue in <span class="timer">5</span>';
+							this.timerSpan = this.skipButton.querySelector('.timer');
 						}
 
-						// Resume main video
 						this.player.play();
 					}, 300);
 
-					this.currentAd = null;
+					this.currentOverlay = null;
 				}
 			}
 
-			// Global player instance
-			let currentPlayer = null;
-
 			// Player initialization function
 			function initializePlayer(containerId) {
-				// Destroy existing player if it exists
 				if (currentPlayer) {
 					currentPlayer.destroy();
 					currentPlayer = null;
@@ -387,7 +366,6 @@
 					}
 				};
 
-				// Initialize based on source type
 				const sourceType = container.dataset.sourceType;
 				if (sourceType === 'youtube') {
 					currentPlayer = new Plyr(container, options);
@@ -398,7 +376,6 @@
 					}
 				}
 
-				// Handle fullscreen if player was initialized
 				if (currentPlayer) {
 					currentPlayer.on('enterfullscreen', () => {
 						container.classList.add('plyr--full');
@@ -407,11 +384,11 @@
 					currentPlayer.on('exitfullscreen', () => {
 						container.classList.remove('plyr--full');
 					});
-				}
 
-				// Initialize ad manager if it's a direct video
-				if (container?.dataset.sourceType === 'direct' && currentPlayer) {
-					new VideoAdManager(currentPlayer, container);
+					// Initialize overlay manager for direct videos
+					if (sourceType === 'direct') {
+						new VideoOverlayManager(currentPlayer, container);
+					}
 				}
 
 				return currentPlayer;
@@ -424,76 +401,6 @@
 					initializePlayer('player-{{ $source->id }}');
 				}
 			});
-
-			// Function to handle source changes
-			window.changeSource = async function(sourceId) {
-				const playerContainer = document.getElementById('player-container');
-				if (!playerContainer) return;
-
-				try {
-					// Show loading state
-					playerContainer.innerHTML = `
-                        <div class="w-full h-full flex items-center justify-center bg-black/90">
-                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-                        </div>
-                    `;
-
-					// Fetch new source
-					const response = await fetch(`/api/movies/sources/${sourceId}`);
-					if (!response.ok) throw new Error('Failed to fetch source');
-
-					const data = await response.json();
-
-					// Update container with new player HTML
-					playerContainer.innerHTML = data.player_html;
-
-					// Get the new player container
-					const newPlayerContainer = playerContainer.querySelector('[id^="player-"]');
-					if (newPlayerContainer) {
-						// Initialize new player
-						initializePlayer(newPlayerContainer.id);
-					}
-
-					// Update button states
-					document.querySelectorAll('[data-source-id]').forEach(button => {
-						const isActive = button.dataset.sourceId === sourceId;
-						button.classList.toggle('bg-blue-500', isActive);
-						button.classList.toggle('text-white', isActive);
-						button.classList.toggle('bg-gray-700', !isActive);
-						button.classList.toggle('text-gray-300', !isActive);
-						button.setAttribute('aria-pressed', isActive.toString());
-					});
-
-				} catch (error) {
-					console.error('Error changing source:', error);
-					showErrorMessage(sourceId);
-				}
-			};
-
-			function showErrorMessage(sourceId) {
-				const playerContainer = document.getElementById('player-container');
-				if (!playerContainer) return;
-
-				playerContainer.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-black/90">
-                        <div class="text-center p-6">
-                            <div class="w-16 h-16 rounded-full bg-gray-800/50 mx-auto flex items-center justify-center mb-4">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <p class="text-gray-400 mb-4">Không thể tải nguồn phim</p>
-                            <button
-                                onclick="changeSource('${sourceId}')"
-                                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
-                            >
-                                Thử lại
-                            </button>
-                        </div>
-                    </div>
-                `;
-			}
 		</script>
 	@endpush
 @endonce

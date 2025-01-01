@@ -23,4 +23,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/search', [MovieController::class, 'search']);
 Route::get('/movies/sources/{sourceId}', [MovieController::class, 'getSource']);
-Route::get('/movie-ads/next', [App\Http\Controllers\MovieAdController::class, 'getNextAd']);
+Route::get('/movie-breaks/next', [App\Http\Controllers\MovieAdController::class, 'getNext']);
