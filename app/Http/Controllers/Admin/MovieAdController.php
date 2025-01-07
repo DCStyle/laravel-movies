@@ -38,7 +38,7 @@ class MovieAdController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:image,video',
-            'content' => 'required|file|mimes:jpeg,png,jpg,gif,mp4,webm|max:184320',
+            'content' => 'required|file|mimes:jpeg,png,jpg,gif,mp4,webm|max:262144',
             'display_time' => 'required|numeric|min:0|max:100',
             'duration' => 'required_if:type,image|nullable|integer|min:1',
             'click_url' => 'nullable|url',
@@ -71,7 +71,7 @@ class MovieAdController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:image,video',
-            'content' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,webm|max:10240',
+            'content' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,webm|max:262144',
             'display_time' => 'required|numeric|min:0|max:100',
             'duration' => 'required_if:type,image|nullable|integer|min:1',
             'click_url' => 'nullable|url',
