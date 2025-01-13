@@ -139,7 +139,7 @@
                                 @enderror
                             </div>
 
-                            <!-- Display Time & Duration -->
+                            <!-- Duration Fields - Update this section in your template -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="relative">
                                     <label class="block text-sm font-medium text-gray-700">
@@ -160,17 +160,21 @@
                                     </div>
                                 </div>
 
-                                <div id="duration-field" class="relative {{ old('type', $movieAd->type) !== 'image' ? 'hidden' : '' }}">
-                                    <label class="block text-sm font-medium text-gray-700">
-                                        Thời gian hiển thị (giây)
+                                <div class="relative">
+                                    <label class="block text-sm font-medium text-gray-700 duration-label">
+                                        <!-- Label will be updated via JavaScript -->
+                                        Thời gian hiển thị
                                     </label>
                                     <div class="mt-2">
                                         <input type="number"
                                                name="duration"
-                                               min="1"
+                                               min="0"
                                                value="{{ old('duration', $movieAd->duration ?? 5) }}"
                                                class="w-full rounded-lg border-gray-300">
                                     </div>
+                                    <p class="mt-1 text-sm text-gray-500 duration-help">
+                                        <!-- Help text will be updated via JavaScript -->
+                                    </p>
                                 </div>
                             </div>
 
@@ -253,73 +257,82 @@
 
 @push('scripts')
     <script>
-	    function handleTypeChange(input) {
-		    const durationType = input.value;
-		    const durationField = document.getElementById('duration-field');
-		    const fileInput = document.querySelector('input[type="file"]');
+		function updateDurationField(type) {
+			const durationLabel = document.querySelector('.duration-label');
+			const durationHelp = document.querySelector('.duration-help');
+			const durationInput = document.querySelector('input[name="duration"]');
 
-		    // Update file input accept attribute
-		    if (durationType === 'image') {
-			    durationField.classList.remove('hidden');
-			    fileInput.setAttribute('accept', 'image/*');
-		    } else {
-			    durationField.classList.add('hidden');
-			    fileInput.setAttribute('accept', 'video/*');
-		    }
+			if (type === 'image') {
+				durationLabel.textContent = 'Thời gian hiển thị (giây)';
+				durationHelp.textContent = 'Thời gian hiển thị ảnh quảng cáo';
+				durationInput.min = '1';
+				durationInput.value = Math.max(1, durationInput.value);
+			} else {
+				durationLabel.textContent = 'Thời gian bỏ qua (giây)';
+				durationHelp.textContent = 'Đặt 0 để bắt buộc xem hết video quảng cáo';
+				durationInput.min = '0';
+			}
+		}
 
-		    // Update visual states for all type options
-		    document.querySelectorAll('[name="type"]').forEach(radio => {
-			    const label = radio.closest('label');
-			    const icon = label.querySelector('.type-icon');
-			    const textSpan = label.querySelector('.type-text');
-			    const isSelected = radio.value === durationType;
+		function handleTypeChange(input) {
+			const durationType = input.value;
+			updateDurationField(durationType);
+			const fileInput = document.querySelector('input[type="file"]');
 
-			    // Update label classes
-			    label.classList.toggle('border-blue-500', isSelected);
-			    label.classList.toggle('bg-blue-50', isSelected);
-			    label.classList.toggle('border-gray-200', !isSelected);
+			// Update file input accept attribute
+			fileInput.setAttribute('accept', durationType === 'image' ? 'image/*' : 'video/*');
 
-			    // Update icon classes
-			    icon.classList.toggle('bg-blue-500', isSelected);
-			    icon.classList.toggle('text-white', isSelected);
-			    icon.classList.toggle('bg-gray-100', !isSelected);
-			    icon.classList.toggle('text-gray-500', !isSelected);
+			// Update visual states for all type options
+			document.querySelectorAll('[name="type"]').forEach(radio => {
+				const label = radio.closest('label');
+				const icon = label.querySelector('.type-icon');
+				const textSpan = label.querySelector('.type-text');
+				const isSelected = radio.value === durationType;
 
-			    // Update text classes
-			    textSpan.classList.toggle('text-blue-600', isSelected);
-			    textSpan.classList.toggle('text-gray-900', !isSelected);
+				// Update label classes
+				label.classList.toggle('border-blue-500', isSelected);
+				label.classList.toggle('bg-blue-50', isSelected);
+				label.classList.toggle('border-gray-200', !isSelected);
 
-			    // Handle selected indicator
-			    let indicator = label.querySelector('.selected-indicator');
-			    if (isSelected) {
-				    if (!indicator) {
-					    indicator = document.createElement('div');
-					    indicator.className = 'absolute top-2 right-2 selected-indicator';
-					    indicator.innerHTML = `
-                    <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clip-rule="evenodd" />
-                    </svg>
-                `;
-					    label.appendChild(indicator);
-				    }
-			    } else if (indicator) {
-				    indicator.remove();
-			    }
-		    });
+				// Update icon classes
+				icon.classList.toggle('bg-blue-500', isSelected);
+				icon.classList.toggle('text-white', isSelected);
+				icon.classList.toggle('bg-gray-100', !isSelected);
+				icon.classList.toggle('text-gray-500', !isSelected);
 
-		    // Reset file input if type changes
-		    if (fileInput.value) {
-			    const previewContainer = fileInput.closest('label').querySelector('.preview-container');
-			    const uploadContainer = fileInput.closest('label').querySelector('.content-upload');
+				// Update text classes
+				textSpan.classList.toggle('text-blue-600', isSelected);
+				textSpan.classList.toggle('text-gray-900', !isSelected);
 
-			    fileInput.value = '';
-			    previewContainer.classList.add('hidden');
-			    previewContainer.innerHTML = '';
-			    uploadContainer.classList.remove('hidden');
-		    }
-	    }
+				// Handle selected indicator
+				let indicator = label.querySelector('.selected-indicator');
+				if (isSelected) {
+					if (!indicator) {
+						indicator = document.createElement('div');
+						indicator.className = 'absolute top-2 right-2 selected-indicator';
+						indicator.innerHTML = `
+                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        `;
+						label.appendChild(indicator);
+					}
+				} else if (indicator) {
+					indicator.remove();
+				}
+			});
+
+			// Reset file input if type changes
+			if (fileInput.value) {
+				const previewContainer = fileInput.closest('label').querySelector('.preview-container');
+				const uploadContainer = fileInput.closest('label').querySelector('.content-upload');
+
+				fileInput.value = '';
+				previewContainer.classList.add('hidden');
+				previewContainer.innerHTML = '';
+				uploadContainer.classList.remove('hidden');
+			}
+		}
 
 		function handleFilePreview(input) {
 			if (input.files && input.files[0]) {
@@ -329,10 +342,8 @@
 				const uploadContainer = input.closest('label').querySelector('.content-upload');
 
 				reader.onload = function(e) {
-					// Clear previous preview
 					previewContainer.innerHTML = '';
 
-					// Create preview element based on file type
 					if (file.type.startsWith('image/')) {
 						const img = document.createElement('img');
 						img.src = e.target.result;
@@ -346,19 +357,17 @@
 						previewContainer.appendChild(video);
 					}
 
-					// Show preview and hide upload text
 					previewContainer.classList.remove('hidden');
 					uploadContainer.classList.add('hidden');
 
-					// Add remove button
 					const removeButton = document.createElement('button');
 					removeButton.type = 'button';
 					removeButton.className = 'absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2';
 					removeButton.innerHTML = `
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            `;
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    `;
 					removeButton.onclick = function() {
 						input.value = '';
 						previewContainer.classList.add('hidden');
@@ -372,45 +381,51 @@
 			}
 		}
 
-		// Handle drag and drop
-		document.querySelector('.content-upload').closest('label').addEventListener('dragover', function(e) {
-			e.preventDefault();
-			this.classList.add('border-blue-500', 'bg-blue-50');
-		});
+		// Initialize drag and drop handlers
+		function initializeDragAndDrop() {
+			const uploadLabel = document.querySelector('.content-upload').closest('label');
 
-		document.querySelector('.content-upload').closest('label').addEventListener('dragleave', function(e) {
-			e.preventDefault();
-			this.classList.remove('border-blue-500', 'bg-blue-50');
-		});
+			uploadLabel.addEventListener('dragover', function(e) {
+				e.preventDefault();
+				this.classList.add('border-blue-500', 'bg-blue-50');
+			});
 
-		document.querySelector('.content-upload').closest('label').addEventListener('drop', function(e) {
-			e.preventDefault();
-			this.classList.remove('border-blue-500', 'bg-blue-50');
+			uploadLabel.addEventListener('dragleave', function(e) {
+				e.preventDefault();
+				this.classList.remove('border-blue-500', 'bg-blue-50');
+			});
 
-			const input = this.querySelector('input[type="file"]');
-			const files = e.dataTransfer.files;
+			uploadLabel.addEventListener('drop', function(e) {
+				e.preventDefault();
+				this.classList.remove('border-blue-500', 'bg-blue-50');
 
-			if (files.length) {
-				const file = files[0];
-				const fileType = document.querySelector('input[name="type"]:checked').value;
+				const input = this.querySelector('input[type="file"]');
+				const files = e.dataTransfer.files;
 
-				// Validate file type
-				if ((fileType === 'image' && file.type.startsWith('image/')) ||
-					(fileType === 'video' && file.type.startsWith('video/'))) {
-					input.files = files;
-					handleFilePreview(input);
-				} else {
-					// Show error message
-					const errorDiv = document.createElement('div');
-					errorDiv.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg';
-					errorDiv.textContent = `Please upload ${fileType} files only`;
-					document.body.appendChild(errorDiv);
-					setTimeout(() => errorDiv.remove(), 3000);
+				if (files.length) {
+					const file = files[0];
+					const fileType = document.querySelector('input[name="type"]:checked').value;
+
+					if ((fileType === 'image' && file.type.startsWith('image/')) ||
+						(fileType === 'video' && file.type.startsWith('video/'))) {
+						input.files = files;
+						handleFilePreview(input);
+					} else {
+						showError(`Please upload ${fileType} files only`);
+					}
 				}
-			}
-		});
+			});
+		}
 
-		// Initialize file preview for existing content
+		function showError(message) {
+			const errorDiv = document.createElement('div');
+			errorDiv.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg';
+			errorDiv.textContent = message;
+			document.body.appendChild(errorDiv);
+			setTimeout(() => errorDiv.remove(), 3000);
+		}
+
+		// Initialize everything on page load
 		document.addEventListener('DOMContentLoaded', function() {
 			const existingContent = document.querySelector('#existing-content');
 			if (existingContent) {
@@ -424,13 +439,11 @@
 				}
 			}
 
-			// Set initial type
-			const initialType = document.querySelector('input[name="type"]:checked') ||
-				document.querySelector('input[name="type"][value="image"]');
-			if (initialType) {
-				initialType.checked = true;
-				handleTypeChange(initialType);
-			}
+			// Initialize type selection and duration field
+			const initialType = document.querySelector('input[name="type"]:checked')?.value || 'image';
+			updateDurationField(initialType);
+
+			initializeDragAndDrop();
 		});
     </script>
 @endpush

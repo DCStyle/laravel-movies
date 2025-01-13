@@ -15,7 +15,7 @@ class MovieAd extends Model
         'type', // 'image' or 'video'
         'content_path',
         'display_time', // percentage of video duration (0-100)
-        'duration', // for image ads: how long to show in seconds
+        'duration', // for image ads: how long to show in seconds, for video ads: when users can skip (0 means must watch full)
         'is_enabled',
         'order',
         'click_url', // optional URL when ad is clicked

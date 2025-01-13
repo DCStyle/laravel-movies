@@ -277,15 +277,37 @@
 						video.controls = false;
 						video.autoplay = true;
 
+						const skipDuration = overlay.duration || 0;
+
 						// Create timer container
 						const timerContainer = document.createElement('div');
 						timerContainer.className = 'absolute bottom-4 right-4 px-4 py-2 bg-black/70 rounded-lg text-white';
 						this.overlayContent.appendChild(timerContainer);
 
-						// Update timer on timeupdate
+						// Create skip button
+						if (skipDuration > 0) {
+							this.overlayControls.classList.remove('hidden');
+							this.skipButton.disabled = true;
+						}
+
+						// Update timer and skip button on timeupdate
 						video.addEventListener('timeupdate', () => {
-							const timeLeft = Math.ceil(video.duration - video.currentTime);
-							timerContainer.textContent = `Skip in ${timeLeft}s`;
+							const currentTime = video.currentTime;
+							const timeLeft = Math.ceil(video.duration - currentTime);
+
+							if (skipDuration === 0) {
+								timerContainer.textContent = `${timeLeft}s remaining`;
+							} else {
+								if (currentTime >= skipDuration) {
+									this.skipButton.disabled = false;
+									this.skipButton.classList.remove('opacity-50', 'cursor-not-allowed');
+									this.skipButton.textContent = 'Skip Ad';
+									timerContainer.textContent = `${timeLeft}s remaining`;
+								} else {
+									const skipTimeLeft = Math.ceil(skipDuration - currentTime);
+									timerContainer.textContent = `Skip in ${skipTimeLeft}s`;
+								}
+							}
 						});
 
 						video.addEventListener('ended', () => this.skipOverlay());
