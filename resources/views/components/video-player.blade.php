@@ -277,6 +277,17 @@
 						video.controls = false;
 						video.autoplay = true;
 
+						// Create timer container
+						const timerContainer = document.createElement('div');
+						timerContainer.className = 'absolute bottom-4 right-4 px-4 py-2 bg-black/70 rounded-lg text-white';
+						this.overlayContent.appendChild(timerContainer);
+
+						// Update timer on timeupdate
+						video.addEventListener('timeupdate', () => {
+							const timeLeft = Math.ceil(video.duration - video.currentTime);
+							timerContainer.textContent = `Skip in ${timeLeft}s`;
+						});
+
 						video.addEventListener('ended', () => this.skipOverlay());
 						if (overlay.click_url) {
 							video.addEventListener('click', () => window.open(overlay.click_url, '_blank'));
