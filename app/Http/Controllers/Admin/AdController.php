@@ -26,7 +26,7 @@ class AdController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'position' => 'required|string|in:' . implode(',', array_keys(Ad::POSITIONS)),
-            'content' => 'required|string',
+            'content' => 'required',
             'is_active' => 'boolean',
             'order' => 'nullable|integer|min:0'
         ]);
@@ -51,7 +51,7 @@ class AdController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'position' => 'required|string|in:' . implode(',', array_keys(Ad::POSITIONS)),
-            'content' => 'required|string',
+            'content' => 'required',
             'is_active' => 'boolean',
             'order' => 'nullable|integer|min:0'
         ]);

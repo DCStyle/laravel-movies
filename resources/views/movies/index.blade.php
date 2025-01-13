@@ -7,7 +7,9 @@
 @section('content')
     <x-movie-list-hero-slider :latestMovies="$latestMovies" />
 
-    <x-page-hero-header :title="setting('site_name')" />
+    @if(setting('site_h1_tag'))
+        <x-page-hero-header :title="setting('site_h1_tag')" />
+    @endif
 
     <x-movie-list-horizontal title="Phim mới nổi bật" :movies="$highlightedMovies" />
 

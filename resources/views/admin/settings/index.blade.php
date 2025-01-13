@@ -27,6 +27,20 @@
                         @enderror
                     </div>
 
+                    <!-- Site H1 tag -->
+                    <div>
+                        <label for="site_h1_tag" class="block text-sm font-medium text-gray-700">Thẻ H1</label>
+                        <input type="text"
+                               name="site_h1_tag"
+                               id="site_h1_tag"
+                               value="{{ old('site_h1_tag', setting('site_h1_tag')) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                               required>
+                        @error('site_h1_tag')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Site Description -->
                     <div>
                         <label for="site_description" class="block text-sm font-medium text-gray-700">Mô tả trang web</label>

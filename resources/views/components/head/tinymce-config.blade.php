@@ -2,6 +2,22 @@
 <script>
 	tinymce.init({
 		selector: '#tinymce-editor',
+		extended_valid_elements: 'script[src|async|defer|type|charset]',
+		valid_elements: '*[*]',
+		allow_script_urls: true,
+		allow_html_in_named_anchor: true,
+		verify_html: false,
+		forced_root_block: false,
+		remove_linebreaks: false,
+		convert_newlines_to_brs: false,
+		force_p_newlines: false,
+		force_br_newlines: false,
+		schema: 'html5',
+		valid_children: '+body[script],+body[style]',
+		content_css: false,
+		remove_trailing_brs: false,
+		custom_elements: 'script',
+		cleanup: false,
 		plugins: 'advlist anchor autolink charmap code codesample directionality emoticons fullscreen help image importcss insertdatetime link lists media nonbreaking pagebreak preview quickbars searchreplace table template visualblocks visualchars wordcount',
 		toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | align lineheight | checklist numlist bullist indent outdent | forecolor backcolor removeformat | link image media table codesample | charmap emoticons | fullscreen code preview',
 		toolbar_mode: 'sliding',
@@ -30,6 +46,15 @@
 					.then(res => res.json())
 					.then(json => resolve(json.location))
 					.catch(err => reject('Upload failed'));
+			});
+		},
+		setup: function(editor) {
+			document.getElementById('editor-mode').addEventListener('change', function() {
+				if (this.checked) {
+					editor.execCommand('mceCodeEditor');
+				} else {
+					editor.execCommand('mceCodeEditor');
+				}
 			});
 		}
 	});

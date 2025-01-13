@@ -48,6 +48,11 @@
                         <div class="flex items-center justify-between border-b border-gray-200 p-4">
                             <h3 class="text-lg font-medium">Nội dung quảng cáo</h3>
                             <div class="flex items-center space-x-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="editor-mode" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-2 text-sm font-medium text-gray-500">HTML Mode</span>
+                                </label>
                                 <button type="button" class="inline-flex items-center px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50" onclick="previewAd()">
                                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -163,12 +168,11 @@
 
     @push('scripts')
         <script>
-			function previewAd() {
+	        function previewAd() {
 				const content = tinymce.get('tinymce-editor').getContent();
 				document.getElementById('preview-content').innerHTML = content;
 				document.getElementById('preview-container').classList.remove('hidden');
 			}
         </script>
     @endpush
-
 @endsection
