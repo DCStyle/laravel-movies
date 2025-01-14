@@ -14,7 +14,7 @@
             <div class="absolute top-1/2 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent transform translate-y-4 transition-all duration-700"></div>
 
             <!-- Main title with modern typography -->
-            <h1 class="relative text-4xl md:text-6xl lg:text-7xl font-bold text-white text-center tracking-wider">
+            <h1 class="relative text-4xl font-bold text-white text-center tracking-wider">
                <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white hover:from-white hover:via-white/80 hover:to-white/90 transition-all duration-300">
                    {!! $title !!}
                </span>
