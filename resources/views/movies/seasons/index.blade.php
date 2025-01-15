@@ -141,7 +141,7 @@
 				currentSeasonId = null;
 				document.getElementById('modalTitle').textContent = 'Thêm mùa mới';
 				form.reset();
-				form.action = '{{ route("seasons.store", $movie) }}';
+				form.action = '/movies/{{ $movie->id }}/seasons';
 				modal.classList.remove('hidden');
 			}
 
