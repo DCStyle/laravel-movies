@@ -23,17 +23,34 @@
             </div>
 
             <!-- Top Badge -->
-            <div class="absolute top-2 left-2 z-20">
-            <span class="bg-red-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
-                NỔI BẬT
-            </span>
+            <div class="absolute top-2 left-2 z-20 flex gap-2">
+                @if($movie->type === 'series')
+                    <span class="bg-purple-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
+                        SERIES
+                    </span>
+                @endif
+                <span class="bg-red-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
+                    NỔI BẬT
+                </span>
             </div>
 
             <!-- Bottom Badge -->
-            <div class="absolute bottom-2 left-2 z-20">
-            <span class="bg-blue-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
-                {{ $movie->duration }} phút
-            </span>
+            <div class="absolute bottom-2 left-2 z-20 flex flex-wrap gap-2">
+                @if($movie->type === 'series')
+                    <span class="bg-blue-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
+                        {{ $movie->seasons_count ?? $movie->seasons->count() }} Season{{ ($movie->seasons_count ?? $movie->seasons->count()) !== 1 ? 's' : '' }}
+                    </span>
+                @elseif (isset($movie->duration))
+                    <span class="bg-blue-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
+                        {{ $movie->duration }} phút
+                    </span>
+                @endif
+
+                @if($movie->rating)
+                    <span class="bg-yellow-600 text-white px-3 py-1 rounded-sm text-sm font-medium">
+                        {{ number_format($movie->rating, 1) }} ★
+                    </span>
+                @endif
             </div>
 
             <!-- Dark Overlay -->
@@ -50,8 +67,14 @@
             </a>
         </h3>
 
-        <div class="mt-1 text-sm text-gray-400">
-            {{ $movie->release_year }}
+        <div class="mt-1 flex items-center gap-3 text-sm text-gray-400">
+            <span>{{ $movie->release_year }}</span>
+            @if($movie->genres->isNotEmpty())
+                <span>•</span>
+                <span class="line-clamp-1">
+                    {{ $movie->genres->pluck('name')->take(2)->join(', ') }}
+                </span>
+            @endif
         </div>
     </div>
 </div>

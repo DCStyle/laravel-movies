@@ -1,8 +1,4 @@
-@php
-    $extends = auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator';
-@endphp
-
-@extends($extends)
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', 'Quản lý phim')
 @section('header', 'Danh sách phim')
@@ -17,14 +13,24 @@
         </a>
 
         <!-- Search Bar -->
-        <form method="GET" class="relative w-full max-w-sm">
-            <input type="text"
-                   name="search"
-                   placeholder="Tìm kiếm phim..."
-                   value="{{ request('search') }}"
-                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full shadow-md focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm placeholder-gray-400">
-            <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-        </form>
+        <div class="flex items-center space-x-4">
+            <form method="GET" class="relative w-full max-w-sm">
+                <input type="text"
+                       name="search"
+                       placeholder="Tìm kiếm phim..."
+                       value="{{ request('search') }}"
+                       class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full shadow-md focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-sm placeholder-gray-400">
+                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+            </form>
+
+            <select name="type"
+                    class="rounded-lg border-gray-300 text-sm"
+                    onchange="this.form.submit()">
+                <option value="">Tất cả loại</option>
+                <option value="single" {{ request('type') === 'single' ? 'selected' : '' }}>Phim lẻ</option>
+                <option value="series" {{ request('type') === 'series' ? 'selected' : '' }}>Phim bộ</option>
+            </select>
+        </div>
     </div>
 
     <!-- Table Section -->
@@ -33,11 +39,12 @@
             <thead class="bg-gray-100">
             <tr>
                 <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Tiêu đề</th>
+                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Loại</th>
                 <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Danh mục</th>
                 <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Thể loại</th>
                 <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Năm phát hành</th>
                 <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Trạng thái</th>
-                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 text-right">Hành động</th>
+                <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Hành động</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -58,7 +65,25 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-semibold text-gray-800">{{ $movie->title }}</p>
+                            @if($movie->type === 'series')
+                                <p class="text-xs text-gray-500 mt-1">
+                                    {{ $movie->total_seasons ?? $movie->seasons->count() }} Mùa
+                                    • {{ $movie->total_episodes ?? $movie->seasons->sum(fn($s) => $s->episodes->count()) }} Tập
+                                </p>
+                            @endif
                         </div>
+                    </td>
+
+                    <td class="px-6 py-4 text-sm text-gray-700">
+                        @if($movie->type === 'series')
+                            <span class="flex items-center px-3 py-1 text-xs font-medium text-purple-800 bg-purple-100 rounded-full">
+                                <i class="fas fa-tv mr-1"></i> Series
+                            </span>
+                        @else
+                            <span class="flex items-center px-3 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">
+                                <i class="fas fa-film mr-1"></i> Phim lẻ
+                            </span>
+                        @endif
                     </td>
 
                     <!-- Category -->
@@ -104,6 +129,12 @@
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <div id="dropdown-movie-{{ $movie->id }}" class="mt-2 w-36 bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden group-hover:block">
+                                @if($movie->type === 'series')
+                                    <a href="{{ route('seasons.index', $movie) }}"
+                                       class="block px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-film mr-2"></i> Quản lý các mùa / tập
+                                    </a>
+                                @endif
                                 <a href="{{ route('movies.management.edit', $movie) }}"
                                    class="block px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
                                     <i class="fas fa-edit mr-2"></i> Chỉnh sửa

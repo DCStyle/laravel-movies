@@ -6,11 +6,13 @@ use App\Http\Controllers\Admin\AdController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EpisodeController;
 use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MovieAdController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\SeasonController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CountryController;
@@ -46,6 +48,22 @@ Route::middleware(['auth', 'role:admin|mod'])->group(function () {
         Route::get('/{movie}/edit', 'edit')->name('edit');
         Route::put('/{movie}', 'update')->name('update');
         Route::delete('/{movie}', 'destroy')->name('destroy');
+    });
+
+    Route::prefix('movies/{movie}/seasons')->name('seasons.')->group(function () {
+        Route::get('/', [SeasonController::class, 'index'])->name('index');
+        Route::post('/', [SeasonController::class, 'store'])->name('store');
+        Route::put('/{season}', [SeasonController::class, 'update'])->name('update');
+        Route::delete('/{season}', [SeasonController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('seasons/{season}/episodes')->name('episodes.')->group(function () {
+        Route::get('/', [EpisodeController::class, 'index'])->name('index');
+        Route::get('/create', [EpisodeController::class, 'create'])->name('create');
+        Route::post('/', [EpisodeController::class, 'store'])->name('store');
+        Route::get('/{episode}/edit', [EpisodeController::class, 'edit'])->name('edit');
+        Route::put('/{episode}', [EpisodeController::class, 'update'])->name('update');
+        Route::delete('/{episode}', [EpisodeController::class, 'destroy'])->name('destroy');
     });
 });
 
@@ -122,7 +140,12 @@ Route::middleware(['auth', 'role:mod'])->prefix('mod')->name('mod.')->group(func
 // Public Routes
 Route::get('/', [MovieController::class, 'index'])->name('home');
 Route::get('/{slug}', [App\Http\Controllers\IndexController::class, 'show'])->name('index.show');
-Route::get('/phim/{movie:slug}', [MovieController::class, 'show'])->name('movies.show');
+Route::prefix('phim')->group(function () {
+    Route::get('/{movie:slug}', [MovieController::class, 'show'])->name('movies.show');
+    Route::get('/{movie:slug}/season/{season}/episode/{episode}', [MovieController::class, 'episode'])
+        ->name('movies.episode')
+        ->where(['season' => '[0-9]+', 'episode' => '[0-9]+']);
+});
 Route::get('/tim-kiem', [MovieController::class, 'search'])->name('movies.search');
 Route::get('/the-loai/{genre:slug}', [App\Http\Controllers\GenreController::class, 'show'])->name('genres.show');
 Route::get('/quoc-gia/{country:slug}', [CountryController::class, 'show'])->name('countries.show');

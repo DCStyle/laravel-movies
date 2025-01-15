@@ -50,19 +50,22 @@ class MovieManagementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
+            'type' => 'required|in:single,series',
             'description' => 'nullable',
             'banner' => 'nullable|image|max:20480',
             'thumbnail' => 'nullable|image|max:20480',
             'release_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
-            'duration' => 'nullable|integer|min:1',
+            'duration' => $request->input('type') === 'single' ? 'required|integer|min:1' : 'nullable',
+            'total_seasons' => $request->input('type') === 'series' ? 'required|integer|min:1' : 'nullable',
+            'total_episodes' => $request->input('type') === 'series' ? 'required|integer|min:1' : 'nullable',
             'status' => 'required|in:draft,published',
             'genres' => 'array',
             'genres.*' => 'exists:genres,id',
             'category_id' => 'required|exists:categories,id',
-            'sources' => 'required|array',
-            'sources.*.source_type' => 'required|in:direct,fshare,gdrive,youtube,twitter,facebook,tiktok',
-            'sources.*.quality' => 'required|in:360p,480p,720p,1080p,4k',
-            'sources.*.source_url' => 'required|url',
+            'sources' => $request->input('type') === 'single' ? 'required|array' : 'nullable',
+            'sources.*.source_type' => $request->input('type') === 'single' ? 'required|in:direct,fshare,gdrive,youtube,twitter,facebook,tiktok' : 'nullable',
+            'sources.*.quality' => $request->input('type') === 'single' ? 'required|in:360p,480p,720p,1080p,4k' : 'nullable',
+            'sources.*.source_url' => $request->input('type') === 'single' ? 'required|url' : 'nullable',
             'country' => 'required|string|max:255',
             'rating' => 'required|numeric|min:0|max:10',
             'age_rating' => 'required|in:G,PG,PG-13,R',
@@ -88,8 +91,21 @@ class MovieManagementController extends Controller
             ]);
         }
 
-        // Handle movie sources
-        if ($request->has('sources')) {
+        // Create default season for series
+        if ($validated['type'] === 'series') {
+            $season = $movie->seasons()->create([
+                'number' => 1,
+                'title' => 'Season 1',
+            ]);
+
+            // Create initial episode
+            $season->episodes()->create([
+                'number' => 1,
+                'title' => 'Episode 1',
+            ]);
+        }
+        // For single movies, handle sources
+        else {
             foreach ($request->sources as $source) {
                 $movie->sources()->create($source);
             }
@@ -131,22 +147,25 @@ class MovieManagementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
+            'type' => 'required|in:single,series',
             'description' => 'nullable',
             'banner' => 'nullable|image|max:20480',
             'thumbnail' => 'nullable|image|max:20480',
             'release_year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
-            'duration' => 'nullable|integer|min:1',
+            'duration' => $request->input('type') === 'single' ? 'required|integer|min:1' : 'nullable',
+            'total_seasons' => $request->input('type') === 'series' ? 'required|integer|min:1' : 'nullable',
+            'total_episodes' => $request->input('type') === 'series' ? 'required|integer|min:1' : 'nullable',
             'status' => 'required|in:draft,published',
             'genres' => 'array',
             'genres.*' => 'exists:genres,id',
             'category_id' => 'required|exists:categories,id',
-            'sources' => 'required|array',
-            'sources.*.source_type' => 'required|in:direct,fshare,gdrive,youtube,twitter,facebook,tiktok',
-            'sources.*.quality' => 'required|in:360p,480p,720p,1080p,4k',
-            'sources.*.source_url' => 'required|url',
+            'sources' => $request->input('type') === 'single' ? 'required|array' : 'nullable',
+            'sources.*.source_type' => $request->input('type') === 'single' ? 'required|in:direct,fshare,gdrive,youtube,twitter,facebook,tiktok' : 'nullable',
+            'sources.*.quality' => $request->input('type') === 'single' ? 'required|in:360p,480p,720p,1080p,4k' : 'nullable',
+            'sources.*.source_url' => $request->input('type') === 'single' ? 'required|url' : 'nullable',
             'country' => 'required|string|max:255',
             'rating' => 'required|numeric|min:0|max:10',
-            'age_rating' => 'required|in:G,PG,PG-13,R'
+            'age_rating' => 'required|in:G,PG,PG-13,R',
         ]);
 
         $movie->update([
@@ -168,12 +187,10 @@ class MovieManagementController extends Controller
             ]);
         }
 
-        // Handle movie sources
-        if ($request->has('sources')) {
-            // Remove old sources
+        // Handle sources for single movies only
+        if ($validated['type'] === 'single') {
             $movie->sources()->delete();
-
-            foreach ($request->sources as $source) {
+            foreach ($validated['sources'] as $source) {
                 $movie->sources()->create($source);
             }
         }

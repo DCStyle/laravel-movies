@@ -31,6 +31,14 @@ class Movie extends Model
         'country',
         'rating',
         'age_rating',
+        'type', // Add this new field: 'single' or 'series'
+        'total_episodes', // Optional: for series
+        'total_seasons', // Optional: for series
+    ];
+
+    const TYPES = [
+        'single' => 'Single Movie',
+        'series' => 'TV Series'
     ];
 
     protected $searchable = [
@@ -94,9 +102,21 @@ class Movie extends Model
         );
     }
 
+    public function seasons()
+    {
+        return $this->hasMany(Season::class)->orderBy('number');
+    }
+
     public function sources()
     {
-        return $this->hasMany(MovieSource::class);
+        return $this->hasMany(MovieSource::class)->when($this->type === 'single', function($query) {
+            return $query;
+        });
+    }
+
+    public function isSeries()
+    {
+        return $this->type === 'series';
     }
 
     public function uploader()
@@ -112,5 +132,43 @@ class Movie extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function getNextEpisode(Episode $currentEpisode)
+    {
+        // First try to get next episode in current season
+        $nextEpisode = Episode::where('season_id', $currentEpisode->season_id)
+            ->where('number', '>', $currentEpisode->number)
+            ->orderBy('number')
+            ->first();
+
+        if (!$nextEpisode) {
+            // If no next episode in current season, try first episode of next season
+            $nextSeason = Season::where('movie_id', $this->id)
+                ->where('number', '>', $currentEpisode->season->number)
+                ->orderBy('number')
+                ->first();
+
+            if ($nextSeason) {
+                $nextEpisode = $nextSeason->episodes()->orderBy('number')->first();
+            }
+        }
+
+        return $nextEpisode;
+    }
+
+    public function getLatestEpisodes($limit = 5)
+    {
+        if (!$this->isSeries()) {
+            return collect();
+        }
+
+        return Episode::whereHas('season', function($query) {
+            $query->where('movie_id', $this->id);
+        })
+            ->with(['season', 'sources'])
+            ->latest()
+            ->take($limit)
+            ->get();
     }
 }

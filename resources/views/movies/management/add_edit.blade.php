@@ -1,8 +1,4 @@
-@php
-    $extends = auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator';
-@endphp
-
-@extends($extends)
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', $isEdit ? 'Chỉnh sửa phim: ' . $movie->title : 'Thêm phim mới')
 @section('header', $isEdit ? 'Chỉnh sửa phim: ' . $movie->title : 'Thêm phim mới')
@@ -49,6 +45,40 @@
                         @enderror
                     </div>
 
+                    <!-- Movie Type -->
+                    <div>
+                        <label for="type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Loại phim</label>
+                        <select name="type"
+                                id="type"
+                                class="text-sm block w-full"
+                                onchange="handleTypeChange(this.value)"
+                                required
+                                data-plugin-tomSelect
+                        >
+                            <option value="">Chọn loại</option>
+                            <option value="single" {{ old('type', $isEdit ? $movie->type : '') == 'single' ? 'selected' : '' }}>Phim lẻ</option>
+                            <option value="series" {{ old('type', $isEdit ? $movie->type : '') == 'series' ? 'selected' : '' }}>Phim bộ</option>
+                        </select>
+                    </div>
+
+                    <div id="series-fields" class="grid gap-6 series-only {{ old('type', $isEdit ? $movie->type : '') !== 'series' ? 'hidden' : '' }}">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label for="total_seasons" class="block text-sm font-medium mb-2">Số mùa</label>
+                                <input type="number" name="total_seasons" id="total_seasons" min="1"
+                                       value="{{ old('total_seasons', $isEdit ? $movie->total_seasons : '') }}"
+                                       class="w-full rounded-lg border-gray-300">
+                            </div>
+
+                            <div>
+                                <label for="total_episodes" class="block text-sm font-medium mb-2">Số tập</label>
+                                <input type="number" name="total_episodes" id="total_episodes" min="1"
+                                       value="{{ old('total_episodes', $isEdit ? $movie->total_episodes : '') }}"
+                                       class="w-full rounded-lg border-gray-300">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Thể loại -->
                     <div>
                         <label for="genres" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Thể loại</label>
@@ -75,7 +105,7 @@
                         <label for="category_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Danh mục</label>
                         <select name="category_id"
                                 id="category_id"
-                                class="text-sm rounded-lg block w-full"
+                                class="text-sm block w-full"
                                 data-plugin-tomSelect>
                             <option value="">Chọn danh mục</option>
                             @foreach($categories as $category)
@@ -106,7 +136,7 @@
                         </div>
 
                         <!-- Thời lượng -->
-                        <div>
+                        <div class="single-only">
                             <label for="duration" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Thời lượng (phút)</label>
                             <input type="number"
                                    name="duration"
@@ -136,8 +166,10 @@
                             <label for="age_rating" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Độ tuổi</label>
                             <select name="age_rating"
                                     id="age_rating"
-                                    class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                    required>
+                                    class="text-sm block w-full"
+                                    required
+                                    data-plugin-tomSelect
+                            >
                                 <option value="">Chọn độ tuổi</option>
                                 @foreach(App\Models\Movie::AGE_RATINGS as $rating)
                                     <option value="{{ $rating }}" {{ old('age_rating', $isEdit ? $movie->age_rating : '') == $rating ? 'selected' : '' }}>
@@ -152,8 +184,10 @@
                             <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quốc gia</label>
                             <select name="country"
                                     id="country"
-                                    class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                    required>
+                                    class="text-sm block w-full"
+                                    required
+                                    data-plugin-tomSelect
+                            >
                                 <option value="">Chọn quốc gia</option>
                                 @foreach(App\Models\Movie::fetchCountries() as $code => $country)
                                     <option value="{{ $code }}" {{ old('country', $isEdit ? $movie->country : '') == $code ? 'selected' : '' }}>
@@ -168,8 +202,10 @@
                             <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Trạng thái</label>
                             <select name="status"
                                     id="status"
-                                    class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                    required>
+                                    class="text-sm block w-full"
+                                    required
+                                    data-plugin-tomSelect
+                            >
                                 <option value="">Chọn trạng thái</option>
                                 @foreach(App\Models\Movie::STATUSES as $status => $label)
                                     <option value="{{ $status }}" {{ old('status', $isEdit ? $movie->status : '') == $status ? 'selected' : '' }}>
@@ -243,7 +279,7 @@
             </div>
 
             <!-- Nguồn video -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <div id="sources-section" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 single-only {{ old('type', $isEdit ? $movie->type : '') === 'series' ? 'hidden' : '' }}">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Nguồn phim</h3>
                     <button type="button"
@@ -298,7 +334,7 @@
                                         <div class="relative">
                                             <select name="sources[{{ $index }}][quality]"
                                                     class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg block w-full p-2.5 appearance-none"
-                                                    required>
+                                            >
                                                 <option value="">Chọn chất lượng</option>
                                                 <option value="360p" {{ $source->quality == '360p' ? 'selected' : '' }}>360p</option>
                                                 <option value="480p" {{ $source->quality == '480p' ? 'selected' : '' }}>480p</option>
@@ -397,7 +433,7 @@
                                 <div class="relative">
                                     <select name="sources[${index}][source_type]"
                                             class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg block w-full p-2.5 appearance-none"
-                                            required>
+                                    >
                                         <option value="">Chọn loại</option>
                                         <option value="youtube">YouTube</option>
                                         <option value="direct">Direct Upload</option>
@@ -419,7 +455,7 @@
                                 <div class="relative">
                                     <select name="sources[${index}][quality]"
                                             class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg block w-full p-2.5 appearance-none"
-                                            required>
+                                    >
                                         <option value="">Chọn chất lượng</option>
                                         <option value="360p">360p</option>
                                         <option value="480p">480p</option>
@@ -440,7 +476,7 @@
                                        name="sources[${index}][source_url]"
                                        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg block w-full p-2.5"
                                        placeholder="Nhập URL nguồn"
-                                       required>
+                                >
                             </div>
                         </div>
                     </div>
@@ -501,6 +537,37 @@
 					create: select.hasAttribute('data-option-create')
 				});
 			});
+		});
+
+		// Handle type change
+		function handleTypeChange(type) {
+			const seriesFields = document.querySelectorAll('.series-only');
+			const singleFields = document.querySelectorAll('.single-only');
+
+			if (type === 'series') {
+				seriesFields.forEach(field => field.classList.remove('hidden'));
+				singleFields.forEach(field => {
+					field.classList.add('hidden');
+					field.querySelector('input, select')?.removeAttribute('required');
+				});
+
+				// Make series fields required
+				seriesFields.forEach(field => field.querySelector('input')?.setAttribute('required', ''));
+			} else {
+				seriesFields.forEach(field => {
+					field.classList.add('hidden');
+					field.querySelector('input')?.removeAttribute('required');
+				});
+				singleFields.forEach(field => field.classList.remove('hidden'));
+			}
+		}
+
+		// Initialize on page load
+		document.addEventListener('DOMContentLoaded', function() {
+			const typeSelect = document.getElementById('type');
+			if (typeSelect.value) {
+				handleTypeChange(typeSelect.value);
+			}
 		});
     </script>
 @endpush

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\MovieAdController;
+use App\Http\Controllers\Api\EpisodeController;
+use App\Http\Controllers\Api\SeasonController;
 use App\Http\Controllers\MovieController;
 use App\Models\MovieAd;
 use Illuminate\Http\Request;
@@ -23,4 +25,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/search', [MovieController::class, 'search']);
 Route::get('/movies/sources/{sourceId}', [MovieController::class, 'getSource']);
+Route::get('/episodes/sources/{sourceId}', [MovieController::class, 'getSource'])
+    ->defaults('type', 'episode');
+Route::get('/seasons/{season}', [SeasonController::class, 'show']);
+Route::get('/episodes/{episode}', [EpisodeController::class, 'show']);
 Route::get('/movie-breaks/next', [App\Http\Controllers\MovieAdController::class, 'getNext']);

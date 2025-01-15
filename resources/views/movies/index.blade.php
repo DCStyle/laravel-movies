@@ -5,13 +5,13 @@
 @endsection
 
 @section('content')
-    <x-movie-list-hero-slider :latestMovies="$latestMovies" />
+    <x-movie-list-hero-slider :latestMovies="$latestContent" />
 
     @if(setting('site_h1_tag'))
         <x-page-hero-header :title="setting('site_h1_tag')" />
     @endif
 
-    <x-movie-list-horizontal title="Phim mới nổi bật" :movies="$highlightedMovies" />
+    <x-movie-list-horizontal title="Phim mới nổi bật" :movies="$highlightedContent" />
 
     <x-movie-list-horizontal title="Phim chiếu rạp mới cập nhật" :movies="$theatersMovies" />
 
