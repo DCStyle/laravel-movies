@@ -108,8 +108,11 @@
                                     <div class="py-2">
                                         @foreach($movie->seasons as $season)
                                             @php $firstSeasonEpisode = $season->episodes->first(); @endphp
-                                            <a href="{{ route('movies.episode', ['movie' => $movie->slug, 'season' => $season->number, 'episode' => $firstSeasonEpisode->number]) }}"
-                                               class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 {{ ($currentSeason && $currentSeason->id === $season->id) ? 'bg-blue-500/20 text-white' : '' }}">
+                                            <a href="{{ $firstSeasonEpisode
+                                                        ? route('movies.episode', ['movie' => $movie->slug, 'season' => $season->number, 'episode' => $firstSeasonEpisode->number])
+                                                        : '#' }}"
+                                               class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 {{ ($currentSeason && $currentSeason->id === $season->id) ? 'bg-blue-500/20 text-white' : '' }}"
+                                            >
                                                 Mùa {{ $season->number }}
                                             </a>
                                         @endforeach
