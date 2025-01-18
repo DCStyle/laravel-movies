@@ -31,7 +31,7 @@ class MovieAdController extends Controller
                 'overlay' => [
                     'id' => $ad->id,
                     'type' => $ad->type,
-                    'content_url' => url($ad->content_url),
+                    'content_url' => secure_url($ad->content_url),
                     'click_url' => $ad->click_url,
                     'duration' => $ad->duration,
                     'display_time' => $ad->display_time,
