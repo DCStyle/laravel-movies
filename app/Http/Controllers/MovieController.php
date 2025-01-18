@@ -215,7 +215,7 @@ class MovieController extends Controller
                 'id' => $movie->id,
                 'title' => $movie->title,
                 'url' => route('movies.show', $movie),
-                'thumbnail' => Storage::url($movie->thumbnail),
+                'thumbnail' => $movie->getThumbnail(),
                 'year' => $movie->release_year,
                 'description' => Str::limit($movie->description, 100),
                 'genres' => $movie->genres->pluck('name'),

@@ -8,7 +8,7 @@
             @foreach($latestMovies as $movie)
                 <div class="swiper-slide relative aspect-[16/9]">
                     <a href="{{ route('movies.show', $movie->slug) }}" class="block w-full h-full">
-                        <img src="{{ Storage::url($movie->banner ?? $movie->thumbnail) }}"
+                        <img src="{{ $movie->getBanner() ?? $movie->getThumbnail() ?? 'https://placeholder.co/300x450' }}"
                              alt="{{ $movie->title }}"
                              class="w-full h-full object-cover">
 

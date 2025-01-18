@@ -53,9 +53,9 @@
                     <!-- Title and Thumbnail -->
                     <td class="px-6 py-4 flex items-center">
                         <div class="w-12 h-12 flex-shrink-0">
-                            @if($movie->thumbnail)
-                                <img class="w-12 h-12 rounded-md shadow-md hover:scale-105 transition-transform duration-300"
-                                     src="{{ \Illuminate\Support\Facades\Storage::url($movie->thumbnail) }}"
+                            @if($movie->getThumbnail())
+                                <img class="w-12 h-12 object-cover rounded-md shadow-md hover:scale-105 transition-transform duration-300"
+                                     src="{{ $movie->getThumbnail() }}"
                                      alt="{{ $movie->title }}">
                             @else
                                 <div class="w-12 h-12 bg-gray-200 rounded-md shadow flex items-center justify-center text-gray-400">

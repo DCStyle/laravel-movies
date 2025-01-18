@@ -4,8 +4,8 @@
     <div class="relative bg-gray-900 rounded-lg shadow-lg overflow-hidden group">
         <!-- Clickable Thumbnail Area -->
         <a href="{{ route('movies.show', $movie->slug) }}" class="block relative aspect-square sm:aspect-[2/3]">
-            @if($movie->thumbnail)
-                <img src="{{ Storage::url($movie->thumbnail) }}"
+            @if($movie->getThumbnail())
+                <img src="{{ $movie->getThumbnail() }}"
                      alt="{{ $movie->title }}"
                      class="w-full h-full object-cover transition-all duration-300 group-hover:scale-110 group-hover:blur-sm"
                      loading="lazy">

@@ -34,6 +34,7 @@ class Movie extends Model
         'type', // Add this new field: 'single' or 'series'
         'total_episodes', // Optional: for series
         'total_seasons', // Optional: for series
+        'crawl_source_url' // Optional: for crawled movies
     ];
 
     const TYPES = [
@@ -87,7 +88,14 @@ class Movie extends Model
 
         static::creating(function ($movie) {
             if (!$movie->slug) {
-                $movie->slug = Str::slug($movie->title);
+                // Generate slug from title, handle duplicate slugs
+                $slug = Str::slug($movie->title);
+                $count = Movie::where('slug', 'like', $slug . '%')->count();
+                if ($count) {
+                    $slug .= '-' . ($count + 1);
+                }
+
+                $movie->slug = $slug;
             }
         });
     }
@@ -170,5 +178,44 @@ class Movie extends Model
             ->latest()
             ->take($limit)
             ->get();
+    }
+
+    public function getBanner()
+    {
+        if ($this->banner)
+        {
+            if (Str::contains($this->banner, 'http'))
+            {
+                return $this->banner;
+            } else {
+                return Storage::url($this->banner);
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public function getThumbnail()
+    {
+        if ($this->thumbnail)
+        {
+            if (Str::contains($this->thumbnail, 'http'))
+            {
+                return $this->thumbnail;
+            } else {
+                return Storage::url($this->thumbnail);
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public function getPlayerIdAttribute()
+    {
+        return md5($this->crawl_source_url);
     }
 }

@@ -9,7 +9,7 @@
         <div class="mb-8 bg-white dark:bg-gray-800 rounded-xl p-6">
             <div class="flex items-start gap-6">
                 <div class="w-32 flex-shrink-0">
-                    <img src="{{ Storage::url($movie->thumbnail) }}"
+                    <img src="{{ $movie->getThumbnail() ?? 'https://placeholder.co/350x200' }}"
                          alt="{{ $movie->title }}"
                          class="w-full rounded-lg shadow-lg">
                 </div>

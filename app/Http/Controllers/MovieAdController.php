@@ -10,23 +10,28 @@ class MovieAdController extends Controller
 {
     public function getNext(Request $request)
     {
+        // Add CORS headers for cross-domain requests
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type');
+
+        if ($request->method() === 'OPTIONS') {
+            return response()->json([], 200);
+        }
+
         $currentTime = $request->query('time', 0);
         $shownAds = array_filter(explode(',', $request->query('shown', '')));
 
-        // Get the next eligible ad that should be shown
         $ad = MovieAd::where('is_enabled', true)
             ->where('display_time', '<=', $currentTime)
             ->when(!empty($shownAds), function($query) use ($shownAds) {
-                // Exclude already shown ads
                 $query->whereNotIn('id', $shownAds);
             })
             ->orderBy('display_time')
             ->first();
 
         if ($ad) {
-            // Update last shown timestamp
             $ad->update(['last_shown_at' => now()]);
-
             return response()->json([
                 'overlay' => [
                     'id' => $ad->id,
@@ -36,9 +41,10 @@ class MovieAdController extends Controller
                     'duration' => $ad->duration,
                     'display_time' => $ad->display_time,
                 ]
-            ]);
+            ])->header('Access-Control-Allow-Origin', '*');
         }
 
-        return response()->json(['ad' => null]);
+        return response()->json(['overlay' => null])
+            ->header('Access-Control-Allow-Origin', '*');
     }
 }

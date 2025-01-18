@@ -231,8 +231,8 @@
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ảnh thu nhỏ</label>
                         <div class="flex items-center space-x-4">
                             <div id="thumbnail-preview" class="relative w-40 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
-                                @if($isEdit && $movie->thumbnail)
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($movie->thumbnail) }}"
+                                @if($isEdit && $movie->getThumbnail())
+                                    <img src="{{ $movie->getThumbnail() }}"
                                          alt="Ảnh thu nhỏ"
                                          class="w-full h-full object-cover">
                                 @endif
@@ -313,6 +313,7 @@
                                                     class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg block w-full p-2.5 appearance-none"
                                                     required>
                                                 <option value="">Chọn loại</option>
+                                                <option value="embed" {{ $source->source_type == 'embed' ? 'selected' : '' }}>Embed Player</option>
                                                 <option value="youtube" {{ $source->source_type == 'youtube' ? 'selected' : '' }}>YouTube</option>
                                                 <option value="direct" {{ $source->source_type == 'direct' ? 'selected' : '' }}>Direct Upload</option>
                                                 <option value="fshare" {{ $source->source_type == 'fshare' ? 'selected' : '' }}>FShare</option>
@@ -435,6 +436,7 @@
                                             class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg block w-full p-2.5 appearance-none"
                                     >
                                         <option value="">Chọn loại</option>
+                                        <option value="embed">Embed Player</option>
                                         <option value="youtube">YouTube</option>
                                         <option value="direct">Direct Upload</option>
                                         <option value="fshare">FShare</option>

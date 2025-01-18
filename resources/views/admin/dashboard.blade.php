@@ -81,8 +81,8 @@
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
                                     <div class="w-16 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                                        @if($movie->thumbnail)
-                                            <img src="{{ Storage::url($movie->thumbnail) }}"
+                                        @if($movie->getThumbnail())
+                                            <img src="{{ $movie->getThumbnail() }}"
                                                  alt="{{ $movie->title }}"
                                                  class="w-full h-full object-cover">
                                         @endif
@@ -134,8 +134,8 @@
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
                                     <div class="w-16 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                                        @if($movie->thumbnail)
-                                            <img src="{{ Storage::url($movie->thumbnail) }}"
+                                        @if($movie->getThumbnail())
+                                            <img src="{{ $movie->getThumbnail() }}"
                                                  alt="{{ $movie->title }}"
                                                  class="w-full h-full object-cover">
                                         @endif

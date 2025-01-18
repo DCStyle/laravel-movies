@@ -68,16 +68,26 @@
 					</div>
 					@break
 
+				@case('embed')
+					<iframe src="{{ e($source->source_url) }}"
+							class="w-full h-full"
+							allowfullscreen
+							allow="autoplay; fullscreen"
+							loading="lazy"
+							referrerpolicy="no-referrer"
+							sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+					</iframe>
+					@break
+
 				@default
 					<div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-400">
 						<p>Unsupported video source type: {{ e($source->source_type) }}</p>
 					</div>
 			@endswitch
 
-			<!-- Overlay Container (for all source types) -->
+			<!-- Overlay Container -->
 			<div class="overlay-container absolute inset-0 bg-black/90 hidden z-50">
 				<div class="overlay-content relative w-full h-full flex items-center justify-center">
-					<!-- Content will be dynamically inserted here -->
 				</div>
 				<div class="overlay-controls absolute bottom-4 right-4 hidden">
 					<button type="button"
@@ -102,38 +112,30 @@
 			.plyr--full {
 				height: 100vh !important;
 			}
-
 			.plyr--video {
 				height: 100%;
 			}
-
 			.overlay-container {
 				transition: opacity 0.3s ease-in-out;
 			}
-
 			.overlay-container.hiding {
 				opacity: 0;
 			}
-
 			.skip-overlay-button {
 				transition: all 0.3s ease-in-out;
 			}
-
 			.skip-overlay-button:not(:disabled) {
 				opacity: 1;
 				cursor: pointer;
 			}
-
 			.skip-overlay-button:not(:disabled):hover {
 				background-color: #2563eb;
 			}
-
 			.video-content, .image-content {
 				max-width: 100%;
 				max-height: 100%;
 				object-fit: contain;
 			}
-
 			.image-content.clickable {
 				cursor: pointer;
 			}
@@ -158,11 +160,27 @@
 					this.skipTimeout = null;
 					this.countdownInterval = null;
 					this.shownOverlays = new Set();
+					this.embedTimer = null;
+					this.embedStartTime = Date.now();
 
 					this.setupEventListeners();
 				}
 
+				setPlayer(player) {
+					this.player = player;
+					this.setupEventListeners(); // Reinitialize event listeners with new player
+				}
+
 				setupEventListeners() {
+					// For embed players, use a timer-based approach
+					if (this.container.querySelector('iframe[src*="embed"]')) {
+						this.embedTimer = setInterval(() => this.checkForOverlays(), 1000);
+						return;
+					}
+
+					// Skip if no player is available yet
+					if (!this.player) return;
+
 					if (this.player.on) {
 						// For Plyr players
 						this.player.on('timeupdate', () => this.checkForOverlays());
@@ -197,7 +215,12 @@
 				}
 
 				getCurrentTime() {
-					if (this.player.currentTime !== undefined) {
+					if (this.container.querySelector('iframe[src*="embed"]')) {
+						// For embed players, calculate time since start
+						const elapsedSeconds = (Date.now() - this.embedStartTime) / 1000;
+						// Assuming a standard video length of 2 hours (7200 seconds)
+						return (elapsedSeconds / 7200) * 100;
+					} else if (this.player.currentTime !== undefined) {
 						// Plyr or native video
 						const duration = this.player.duration || 0;
 						return duration ? (this.player.currentTime / duration) * 100 : 0;
@@ -210,7 +233,10 @@
 				}
 
 				isPlaying() {
-					if (this.player.playing !== undefined) {
+					if (this.container.querySelector('iframe[src*="embed"]')) {
+						// For embed players, assume always playing
+						return true;
+					} else if (this.player.playing !== undefined) {
 						return this.player.playing;
 					} else if (this.player.getPlayerState) {
 						return this.player.getPlayerState() === YT.PlayerState.PLAYING;
@@ -221,18 +247,24 @@
 				}
 
 				pauseVideo() {
-					if (this.player.pause) {
-						this.player.pause();
-					} else if (this.player.pauseVideo) {
-						this.player.pauseVideo();
+					// For embed players, we can't control playback
+					if (!this.container.querySelector('iframe[src*="embed"]')) {
+						if (this.player.pause) {
+							this.player.pause();
+						} else if (this.player.pauseVideo) {
+							this.player.pauseVideo();
+						}
 					}
 				}
 
 				playVideo() {
-					if (this.player.play) {
-						this.player.play();
-					} else if (this.player.playVideo) {
-						this.player.playVideo();
+					// For embed players, we can't control playback
+					if (!this.container.querySelector('iframe[src*="embed"]')) {
+						if (this.player.play) {
+							this.player.play();
+						} else if (this.player.playVideo) {
+							this.player.playVideo();
+						}
 					}
 				}
 
@@ -279,18 +311,15 @@
 
 						const skipDuration = overlay.duration || 0;
 
-						// Create timer container
 						const timerContainer = document.createElement('div');
 						timerContainer.className = 'absolute bottom-4 right-4 px-4 py-2 bg-black/70 rounded-lg text-white';
 						this.overlayContent.appendChild(timerContainer);
 
-						// Create skip button
 						if (skipDuration > 0) {
 							this.overlayControls.classList.remove('hidden');
 							this.skipButton.disabled = true;
 						}
 
-						// Update timer and skip button on timeupdate
 						video.addEventListener('timeupdate', () => {
 							const currentTime = video.currentTime;
 							const timeLeft = Math.ceil(video.duration - currentTime);
@@ -373,6 +402,18 @@
 
 					this.currentOverlay = null;
 				}
+
+				destroy() {
+					if (this.embedTimer) {
+						clearInterval(this.embedTimer);
+					}
+					if (this.skipTimeout) {
+						clearTimeout(this.skipTimeout);
+					}
+					if (this.countdownInterval) {
+						clearInterval(this.countdownInterval);
+					}
+				}
 			}
 
 			// Player initialization function
@@ -404,8 +445,15 @@
 				};
 
 				const sourceType = container.dataset.sourceType;
-				let playerElement = null;
 
+				// Initialize overlay manager first
+				const overlayManager = new VideoOverlayManager(null, container);
+
+				if (sourceType === 'embed') {
+					return; // For embed sources, we only need the overlay manager
+				}
+
+				let playerElement = null;
 				switch (sourceType) {
 					case 'youtube':
 						playerElement = container.querySelector('.youtube-embed');
@@ -416,7 +464,6 @@
 					case 'facebook':
 						if (window.FB) {
 							FB.XFBML.parse(container);
-							// Facebook videos don't support our overlay system
 							return;
 						}
 						break;
@@ -427,6 +474,8 @@
 
 					currentPlayer.on('ready', () => {
 						container.classList.add('plyr--initialized');
+						// Update overlay manager with player instance after initialization
+						overlayManager.setPlayer(currentPlayer);
 					});
 
 					currentPlayer.on('enterfullscreen', () => {
@@ -436,9 +485,6 @@
 					currentPlayer.on('exitfullscreen', () => {
 						container.classList.remove('plyr--full');
 					});
-
-					// Initialize overlay manager for all supported players
-					new VideoOverlayManager(currentPlayer, container);
 				}
 
 				return currentPlayer;
@@ -454,7 +500,6 @@
 				// Initialize Facebook SDK if needed
 				if (container?.querySelector('.fb-video')) {
 					if (!window.FB) {
-						// Load Facebook SDK
 						const script = document.createElement('script');
 						script.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0";
 						script.async = true;
@@ -476,7 +521,7 @@
 			});
 
 			// Function to handle source changes
-			window.changeSource = async function(sourceId) {
+			window.changeSource = async function(sourceId, type = 'movie') {
 				const playerContainer = document.getElementById('player-container');
 				if (!playerContainer) return;
 
@@ -489,12 +534,10 @@
                     `;
 
 					// Fetch new player HTML
-					const response = await fetch(`/api/movies/sources/${sourceId}`);
+					const response = await fetch(`/api/${type}s/sources/${sourceId}`);
 					if (!response.ok) throw new Error('Failed to fetch source');
 
 					const data = await response.json();
-
-					// Update player container
 					playerContainer.innerHTML = data.player_html;
 
 					// Initialize new player
@@ -515,11 +558,11 @@
 
 				} catch (error) {
 					console.error('Error changing source:', error);
-					showErrorMessage(sourceId);
+					showErrorMessage(sourceId, type);
 				}
 			};
 
-			function showErrorMessage(sourceId) {
+			function showErrorMessage(sourceId, type) {
 				const playerContainer = document.getElementById('player-container');
 				if (!playerContainer) return;
 
@@ -531,10 +574,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p class="text-gray-400 mb-4">Không thể tải nguồn phim</p>
-                            <button onclick="changeSource('${sourceId}')"
+                            <p class="text-gray-400 mb-4">Failed to load source</p>
+                            <button onclick="changeSource('${sourceId}', '${type}')"
                                     class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200">
-                                Thử lại
+                                Retry
                             </button>
                         </div>
                     </div>

@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/search', [MovieController::class, 'search']);
+Route::post('/movies/import', [App\Http\Controllers\Api\MovieController::class, 'importMovie']);
 Route::get('/movies/sources/{sourceId}', [MovieController::class, 'getSource']);
 Route::get('/episodes/sources/{sourceId}', [MovieController::class, 'getSource'])
     ->defaults('type', 'episode');

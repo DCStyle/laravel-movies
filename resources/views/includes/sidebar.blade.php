@@ -25,45 +25,51 @@
     </div>
 </div>
 
-<!-- Trending Movies Component for Sidebar -->
-<div class="space-y-4">
-    <!-- Featured Movie Card -->
-    <a href="{{ route('movies.show', $sidebarFeaturedMovie->slug) }}" class="block relative aspect-video rounded-lg overflow-hidden">
-        <img src="{{ \Illuminate\Support\Facades\Storage::url($sidebarFeaturedMovie->thumbnail) }}" alt="{{ $sidebarFeaturedMovie->title }}" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
-            <div class="absolute bottom-0 p-4">
-                <h3 class="text-lg font-medium text-white">{{ $sidebarFeaturedMovie->title }}</h3>
-                <p class="text-gray-300">{{ $sidebarFeaturedMovie->release_year }}</p>
-            </div>
-        </div>
-    </a>
-
-    <!-- Movie List -->
+@if(isset($sidebarFeaturedMovie) || isset($sidebarTrendingMovies))
+    <!-- Trending Movies Component for Sidebar -->
     <div class="space-y-4">
-        @foreach($sidebarTrendingMovies as $sidebarTrendingMovie)
-            <a href="{{ route('movies.show', $sidebarTrendingMovie->slug) }}" class="flex gap-3 group bg-[rgba(30,30,30,.9)] hover:bg-gray-800">
-                <!-- Thumbnail -->
-                <div class="w-16 h-24 shrink-0">
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url($sidebarTrendingMovie->thumbnail) }}" alt="{{ $sidebarTrendingMovie->title }}" class="w-full h-full object-cover">
-                </div>
-
-                <!-- Info -->
-                <div class="flex-1 min-w-0 px-2 py-4">
-                    <h4 class="font-medium text-white group-hover:text-blue-500 transition line-clamp-2">
-                        {{ $sidebarTrendingMovie->title }}
-                    </h4>
-
-                    <div class="flex items-center gap-2 mt-2">
-                        <div class="flex items-center gap-1">
-                            <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                            </svg>
-                            <span class="text-white">{{ $sidebarTrendingMovie->rating }}</span>
-                        </div>
-                        <span class="text-gray-500">{{ $sidebarTrendingMovie->release_year }}</span>
+        @isset($sidebarFeaturedMovie)
+            <!-- Featured Movie Card -->
+            <a href="{{ route('movies.show', $sidebarFeaturedMovie->slug) }}" class="block relative aspect-video rounded-lg overflow-hidden">
+                <img src="{{ $sidebarFeaturedMovie->getBanner() ?? $sidebarFeaturedMovie->getThumbnail() ?? 'https://placehold.co/400' }}" alt="{{ $sidebarFeaturedMovie->title }}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
+                    <div class="absolute bottom-0 p-4">
+                        <h3 class="text-lg font-medium text-white">{{ $sidebarFeaturedMovie->title }}</h3>
+                        <p class="text-gray-300">{{ $sidebarFeaturedMovie->release_year }}</p>
                     </div>
                 </div>
             </a>
-        @endforeach
+        @endisset
+
+        @isset($sidebarTrendingMovies)
+                <!-- Movie List -->
+                <div class="space-y-4">
+                    @foreach($sidebarTrendingMovies as $sidebarTrendingMovie)
+                        <a href="{{ route('movies.show', $sidebarTrendingMovie->slug) }}" class="flex gap-3 group bg-[rgba(30,30,30,.9)] hover:bg-gray-800">
+                            <!-- Thumbnail -->
+                            <div class="w-16 h-24 shrink-0">
+                                <img src="{{ $sidebarTrendingMovie->getThumbnail() ?? 'https://placehold.co/400' }}" alt="{{ $sidebarTrendingMovie->title }}" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- Info -->
+                            <div class="flex-1 min-w-0 px-2 py-4">
+                                <h4 class="font-medium text-white group-hover:text-blue-500 transition line-clamp-2">
+                                    {{ $sidebarTrendingMovie->title }}
+                                </h4>
+
+                                <div class="flex items-center gap-2 mt-2">
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                        </svg>
+                                        <span class="text-white">{{ $sidebarTrendingMovie->rating }}</span>
+                                    </div>
+                                    <span class="text-gray-500">{{ $sidebarTrendingMovie->release_year }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+        @endisset
     </div>
-</div>
+@endif

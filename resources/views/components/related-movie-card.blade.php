@@ -4,9 +4,9 @@
     <!-- Thumbnail -->
     <div class="w-24 h-16 flex-shrink-0 overflow-hidden rounded">
         <a href="{{ route('movies.show', $movie->slug) }}" class="block">
-            @if($movie->thumbnail)
+            @if($movie->getThumbnail())
                 <img
-                        src="{{ Storage::url($movie->thumbnail) }}"
+                        src="{{ $movie->getThumbnail() }}"
                         alt="{{ $movie->title }}"
                         class="w-full h-full object-cover"
                         loading="lazy"

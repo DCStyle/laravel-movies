@@ -83,8 +83,8 @@
                     <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition duration-150">
                         <div class="flex items-center space-x-4">
                             <div class="flex-shrink-0">
-                                @if($movie->thumbnail)
-                                    <img src="{{ $movie->thumbnail }}"
+                                @if($movie->getThumbnail())
+                                    <img src="{{ $movie->getThumbnail() }}"
                                          alt="{{ $movie->title }}"
                                          class="w-16 h-10 object-cover rounded-lg">
                                 @else
