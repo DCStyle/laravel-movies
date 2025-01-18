@@ -10,11 +10,6 @@ class MovieAdController extends Controller
 {
     public function getNext(Request $request)
     {
-        // Add CORS headers for cross-domain requests
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: GET, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type');
-
         if ($request->method() === 'OPTIONS') {
             return response()->json([], 200);
         }
