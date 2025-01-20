@@ -32,12 +32,11 @@
                     <!-- Content Editor -->
                     <div>
                         <x-head.tinymce-config/>
-                        <textarea name="content"
-                                  id="tinymce-editor"
+                        <textarea id="tinymce-editor"
+                                  name="content"
                                   rows="20"
-                                  placeholder="Viết nội dung bài viết của bạn tại đây..."
-                                  class="w-full border-0 focus:ring-0 resize-none"
-                        >{{ old('content', $article->content) }}</textarea>
+                                  class="w-full">{{ old('content', $article->content) }}</textarea>
+
                         @error('content')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -136,7 +135,7 @@
                 </div>
             </div>
 
-            <x-slug-preview :nameId="'tin-tuc'" :slugId="'slug-preview'" :nameInput="'title'" :initial-slug="$article->exists ? $article->slug : null" />
+            <x-slug-preview :nameId="'tin-tuc'" :slugId="'slug'" :nameInput="'title'" :initial-slug="$article->exists ? $article->slug : null" />
         </form>
     </div>
 

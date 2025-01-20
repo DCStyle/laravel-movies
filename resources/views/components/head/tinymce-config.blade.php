@@ -49,13 +49,16 @@
 			});
 		},
 		setup: function(editor) {
-			document.getElementById('editor-mode').addEventListener('change', function() {
-				if (this.checked) {
-					editor.execCommand('mceCodeEditor');
-				} else {
-					editor.execCommand('mceCodeEditor');
-				}
-			});
+			const editorMode = document.getElementById('editor-mode');
+			if (editorMode) {
+                editorMode.addEventListener('change', function() {
+                    if (this.checked) {
+                        editor.execCommand('mceCodeEditor');
+                    } else {
+                        editor.execCommand('mceCodeEditor');
+                    }
+                });
+            }
 		}
 	});
 </script>

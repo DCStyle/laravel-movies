@@ -69,7 +69,7 @@
 					@break
 
 				@case('embed')
-					<iframe src="{{ e($source->source_url) }}"
+					<iframe src="{!! html_entity_decode($source->source_url) !!}"
 							class="w-full h-full"
 							allowfullscreen
 							allow="autoplay; fullscreen"

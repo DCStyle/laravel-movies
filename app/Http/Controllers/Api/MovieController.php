@@ -11,13 +11,38 @@ use Illuminate\Support\Str;
 
 class MovieController extends Controller
 {
-    public function findMovieByCrawlSourceUrl(Request $request)
+    public function importSource(Request $request)
     {
-        $validatedData = $request->validate([
-            'md5_hashed_crawl_source_url' => 'required|string'
+        $request->validate([
+            'crawl_source_url' => 'required|string',
+            'source_url' => 'required|string'
         ]);
 
+        // Find movie by crawl_source_url
+        $movie = Movie::where('crawl_source_url', $request->crawl_source_url)->first();
 
+        if (!$movie) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Movie not found'
+            ], 404);
+        }
+
+        // Delete all existing sources
+        $movie->sources()->delete();
+
+        // Create new source
+        $movie->sources()->create([
+            'source_type' => 'embed',
+            'source_url' => html_entity_decode($request->source_url, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            'quality' => '1080p', // Default quality
+            'is_primary' => false
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Source imported successfully'
+        ]);
     }
 
     public function importMovie(Request $request)
