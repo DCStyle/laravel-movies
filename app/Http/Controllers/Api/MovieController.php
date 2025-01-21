@@ -11,6 +11,70 @@ use Illuminate\Support\Str;
 
 class MovieController extends Controller
 {
+    public function importEpisodeSource(Request $request)
+    {
+        $request->validate([
+            'crawl_source_url' => 'required|string',
+            'episode_number' => 'required|integer',
+            'season_number' => 'required|integer',
+            'source_url' => 'required|string'
+        ]);
+
+        // Find movie by crawl_source_url
+        $movie = Movie::where('crawl_source_url', $request->crawl_source_url)->first();
+
+        if (!$movie) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Movie not found'
+            ], 404);
+        }
+
+        // Find existing season by season_number
+        $season = $movie->seasons()->where('number', $request->season_number)->first();
+
+        // If no season found, create new one
+        if (!$season) {
+            $season = $movie->seasons()->create([
+                'number' => $request->season_number,
+                'title' => 'Season ' . $request->season_number,
+                'description' => '',
+                'poster' => '',
+                'release_date' => now()
+            ]);
+        }
+
+        // Find existing episode by number within the season
+        $episode = $season->episodes()->where('number', $request->episode_number)->first();
+
+        // If no episode found, create new one
+        if (!$episode) {
+            $episode = $season->episodes()->create([
+                'number' => $request->episode_number,
+                'title' => 'Episode ' . $request->episode_number,
+                'description' => '',
+                'thumbnail' => '',
+                'duration' => 0,
+                'air_date' => now()
+            ]);
+        }
+
+        // Add new source only if it doesn't exist
+        if (!$episode->sources()->where('source_url', html_entity_decode($request->source_url))->exists()) {
+            $episode->sources()->create([
+                'source_type' => 'embed',
+                'source_url' => html_entity_decode($request->source_url, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                'quality' => '1080p',
+                'is_primary' => true
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Source imported successfully'
+        ]);
+    }
+
     public function importSource(Request $request)
     {
         $request->validate([

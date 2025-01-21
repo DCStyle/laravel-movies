@@ -27,6 +27,7 @@ Route::get('/search', [MovieController::class, 'search']);
 
 Route::post('/movies/import', [App\Http\Controllers\Api\MovieController::class, 'importMovie']);
 Route::post('/movies/import-source', [App\Http\Controllers\Api\MovieController::class, 'importSource']);
+Route::post('/movies/import-episode-source', [App\Http\Controllers\Api\MovieController::class, 'importEpisodeSource']);
 
 Route::get('/movies/sources/{sourceId}', [MovieController::class, 'getSource']);
 Route::get('/episodes/sources/{sourceId}', [MovieController::class, 'getSource'])

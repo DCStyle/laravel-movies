@@ -21,7 +21,7 @@ class CategoryController extends Controller
             ->where('status', 'published')
             ->where('status', 'published')
             ->latest()
-            ->paginate(12);
+            ->paginate(50);
 
         return view('categories.show', compact(
             'category',
