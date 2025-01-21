@@ -26,59 +26,59 @@
 
 @section('content')
     <!-- Hero Section -->
-    <div class="mb-12">
-        @if($movie->type === 'single')
-            <!-- Single Movie Player -->
-            <div class="relative rounded-3xl overflow-hidden backdrop-blur-xl bg-black/30 shadow-2xl">
-                <section class="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-                    <!-- Video Player -->
-                    <div class="relative" style="padding-top: 56.25%">
-                        <div id="player-container" class="absolute inset-0">
-                            @if($movie->sources->isNotEmpty())
-                                <x-video-player
-                                        :source="$movie->sources->firstWhere('is_primary', true) ?? $movie->sources->first()"
-                                        :key="'player-' . ($movie->sources->firstWhere('is_primary', true)?->id ?? $movie->sources->first()?->id)"
-                                />
-                            @else
-                                <div class="w-full h-full flex items-center justify-center bg-black/50 backdrop-blur-xl">
-                                    <p class="text-gray-400">No sources available</p>
-                                </div>
-                            @endif
-                        </div>
+    @if($movie->type === 'single')
+        <!-- Single Movie Player -->
+        <div class="relative rounded-3xl overflow-hidden backdrop-blur-xl bg-black/30 shadow-2xl mb-12">
+            <section class="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+                <!-- Video Player -->
+                <div class="relative" style="padding-top: 56.25%">
+                    <div id="player-container" class="absolute inset-0">
+                        @if($movie->sources->isNotEmpty())
+                            <x-video-player
+                                    :source="$movie->sources->firstWhere('is_primary', true) ?? $movie->sources->first()"
+                                    :key="'player-' . ($movie->sources->firstWhere('is_primary', true)?->id ?? $movie->sources->first()?->id)"
+                            />
+                        @else
+                            <div class="w-full h-full flex items-center justify-center bg-black/50 backdrop-blur-xl">
+                                <p class="text-gray-400">No sources available</p>
+                            </div>
+                        @endif
                     </div>
+                </div>
 
-                    <!-- Source Selection Bar -->
-                    @if($movie->sources->count() > 1)
-                        <div class="bg-gray-800/50 backdrop-blur-sm border-t border-gray-700">
-                            <div class="max-w-3xl mx-auto px-6 py-4">
-                                <div class="flex flex-wrap gap-2" role="group" aria-label="Video sources">
-                                    @foreach($movie->sources as $source)
-                                        <button
-                                                type="button"
-                                                onclick="changeSource('{{ $source->id }}', 'movie')"
-                                                class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 source-button
+                <!-- Source Selection Bar -->
+                @if($movie->sources->count() > 1)
+                    <div class="bg-gray-800/50 backdrop-blur-sm border-t border-gray-700">
+                        <div class="max-w-3xl mx-auto px-6 py-4">
+                            <div class="flex flex-wrap gap-2" role="group" aria-label="Video sources">
+                                @foreach($movie->sources as $source)
+                                    <button
+                                            type="button"
+                                            onclick="changeSource('{{ $source->id }}', 'movie')"
+                                            class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 source-button
                                                 {{ $source->is_primary ? 'bg-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white' }}"
-                                                aria-pressed="{{ $source->is_primary ? 'true' : 'false' }}"
-                                                data-source-id="{{ $source->id }}"
-                                        >
+                                            aria-pressed="{{ $source->is_primary ? 'true' : 'false' }}"
+                                            data-source-id="{{ $source->id }}"
+                                    >
                                             <span class="flex items-center gap-2">
                                                 {{ ucfirst($source->source_type) }} - {{ strtoupper($source->quality) }}
                                             </span>
-                                        </button>
-                                    @endforeach
-                                </div>
+                                    </button>
+                                @endforeach
                             </div>
                         </div>
-                    @endif
-                </section>
-            </div>
-        @else
-            <!-- Series Player (if episode is selected) -->
-            @if(isset($currentEpisode))
+                    </div>
+                @endif
+            </section>
+        </div>
+    @else
+        <!-- Series Player (if episode is selected) -->
+        @if(isset($currentEpisode))
+            <div class="mb-12">
                 <x-episode-player :episode="$currentEpisode" :movie="$movie" />
-            @endif
+            </div>
         @endif
-    </div>
+    @endif
 
     <!-- Content Grid -->
     <div class="grid lg:grid-cols-12 gap-8">
@@ -95,29 +95,35 @@
 
                         @if($movie->type === 'series')
                             <div class="relative group">
-                                <button class="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors duration-200">
-                                    <span class="text-gray-300">Mùa {{ $currentSeason?->number ?? 1 }}</span>
-                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                    <span class="text-sm text-gray-500 ml-2">({{ $movie->total_seasons ?? $movie->seasons->count() }} mùa)</span>
-                                </button>
+                                @if($movie->seasons->count() > 0)
+                                    <button class="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors duration-200">
+                                        <span class="text-gray-300">Mùa {{ $currentSeason?->number ?? 1 }}</span>
+                                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                        <span class="text-sm text-gray-500 ml-2">({{ $movie->total_seasons ?? $movie->seasons->count() }} mùa)</span>
+                                    </button>
 
-                                <!-- Dropdown -->
-                                <div class="absolute left-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                    <div class="py-2">
-                                        @foreach($movie->seasons as $season)
-                                            @php $firstSeasonEpisode = $season->episodes->first(); @endphp
-                                            <a href="{{ $firstSeasonEpisode
+                                    <!-- Dropdown -->
+                                    <div class="absolute left-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                        <div class="py-2">
+                                            @foreach($movie->seasons as $season)
+                                                @php $firstSeasonEpisode = $season->episodes->first(); @endphp
+                                                <a href="{{ $firstSeasonEpisode
                                                         ? route('movies.episode', ['movie' => $movie->slug, 'season' => $season->number, 'episode' => $firstSeasonEpisode->number])
                                                         : '#' }}"
-                                               class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 {{ ($currentSeason && $currentSeason->id === $season->id) ? 'bg-blue-500/20 text-white' : '' }}"
-                                            >
-                                                Mùa {{ $season->number }}
-                                            </a>
-                                        @endforeach
+                                                   class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 {{ ($currentSeason && $currentSeason->id === $season->id) ? 'bg-blue-500/20 text-white' : '' }}"
+                                                >
+                                                    Mùa {{ $season->number }}
+                                                </a>
+                                            @endforeach
+                                        </div>
                                     </div>
-                                </div>
+                                @else
+                                    <div class="inline-block px-4 py-2 bg-primary rounded-lg">
+                                        <span class="text-gray-300">COMMING SOON</span>
+                                    </div>
+                                @endif
                             </div>
                         @endif
                     </div>
