@@ -50,7 +50,7 @@
                                              :alt="movie.title">
                                         <div class="ml-4 flex-1">
                                             <h3 class="text-white font-medium line-clamp-1" x-text="movie.title"></h3>
-                                            <div class="text-sm text-gray-500" x-text="movie.title_en">({{ $movie->title_en }})</div>
+                                            <div class="text-sm text-gray-500" x-text="movie.title_en"></div>
                                             <div class="flex items-center mt-1 space-x-2">
                                                 <span class="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded-full" x-text="movie.year"></span>
                                                 <div class="h-1 w-1 bg-gray-600 rounded-full"></div>
