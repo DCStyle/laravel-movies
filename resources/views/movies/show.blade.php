@@ -90,7 +90,10 @@
                 <div class="relative space-y-6">
                     <div class="flex flex-col space-y-4">
                         <h1 class="text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                            {{ $movie->title }}
+                            <div>{{ $movie->title }}</div>
+                            @if($movie->title_en)
+                                <div class="text-lg text-gray-500">({{ $movie->title_en }})</div>
+                            @endif
                         </h1>
 
                         @if($movie->type === 'series')

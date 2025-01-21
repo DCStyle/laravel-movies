@@ -45,6 +45,20 @@
                         @enderror
                     </div>
 
+                    <!-- Tiêu đề (English) -->
+                    <div>
+                        <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tiêu đề tiếng Anh</label>
+                        <input type="text"
+                               name="title_en"
+                               id="title_en"
+                               value="{{ old('title_en', $isEdit ? $movie->title_en : '') }}"
+                               class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                               placeholder="Nhập tiêu đề tiếng Anh">
+                        @error('title')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Movie Type -->
                     <div>
                         <label for="type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Loại phim</label>

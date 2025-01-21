@@ -16,6 +16,7 @@ class Movie extends Model
 
     protected $fillable = [
         'title',
+        'title_en',
         'slug',
         'description',
         'thumbnail',
@@ -62,6 +63,7 @@ class Movie extends Model
     {
         return [
             'title' => $this->title,
+            'title_en' => $this->title_en,
             'description' => $this->description,
             'country' => $this->country,
             'release_year' => $this->release_year,

@@ -14,7 +14,14 @@
                          class="w-full rounded-lg shadow-lg">
                 </div>
                 <div class="flex-grow">
-                    <h1 class="text-2xl font-bold mb-2">{{ $movie->title }}</h1>
+                    <h1 class="text-2xl font-bold mb-2">
+                        {{ $movie->title }}
+
+                        @if($movie->title_en)
+                            <br/>
+                            <span class="inline-block text-sm text-gray-500">({{ $movie->title_en }})</span>
+                        @endif
+                    </h1>
                     <div class="text-gray-500 dark:text-gray-400 mb-4">
                         {{ $movie->total_seasons }} mùa • {{ $movie->total_episodes }} tập
                     </div>

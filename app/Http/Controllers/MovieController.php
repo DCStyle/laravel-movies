@@ -214,6 +214,7 @@ class MovieController extends Controller
             return [
                 'id' => $movie->id,
                 'title' => $movie->title,
+                'title_en' => $movie->title_en ?? null,
                 'url' => route('movies.show', $movie),
                 'thumbnail' => $movie->getThumbnail(),
                 'year' => $movie->release_year,

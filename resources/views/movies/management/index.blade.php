@@ -64,7 +64,13 @@
                             @endif
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-semibold text-gray-800">{{ $movie->title }}</p>
+                            <p class="text-sm font-semibold text-gray-800">
+                                {{ $movie->title }}
+
+                                @if($movie->title_en)
+                                    <span class="inline-block ml-2 text-xs text-gray-500">({{ $movie->title_en }})</span>
+                                @endif
+                            </p>
                             @if($movie->type === 'series')
                                 <p class="text-xs text-gray-500 mt-1">
                                     {{ $movie->total_seasons ?? $movie->seasons->count() }} Mùa

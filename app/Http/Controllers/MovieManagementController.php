@@ -50,6 +50,7 @@ class MovieManagementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
+            'title_en' => 'nullable|max:255',
             'type' => 'required|in:single,series',
             'description' => 'nullable',
             'banner' => 'nullable|image|max:20480',
@@ -147,6 +148,7 @@ class MovieManagementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
+            'title_en' => 'nullable|max:255',
             'type' => 'required|in:single,series',
             'description' => 'nullable',
             'banner' => 'nullable|image|max:20480',

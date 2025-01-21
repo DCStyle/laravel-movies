@@ -15,6 +15,7 @@
         "ralphjsmit/laravel-seo": "^1.6",
         "spatie/laravel-permission": "^6.10",
         "spatie/laravel-settings": "^3.4",
+        "symfony/dom-crawler": "^6.4",
         "tinymce/tinymce": "^7.6"
     },
     "require-dev": {
