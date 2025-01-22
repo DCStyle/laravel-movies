@@ -431,6 +431,11 @@
 						'play-large', 'play', 'progress', 'current-time',
 						'mute', 'volume', 'settings', 'fullscreen'
 					],
+					fullscreen: {
+						enabled: true,
+						fallback: true,
+						iosNative: true
+					},
 					youtube: {
 						noCookie: true,
 						rel: 0,

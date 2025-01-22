@@ -12,7 +12,7 @@
                 </div>
 
                 <!-- Search Bar -->
-                <div class="relative flex-1 max-w-xl mx-8" x-data="searchMovies()">
+                <div class="relative flex-1 max-w-xl mx-2 md:mx-4 lg:mx-8" x-data="searchMovies()">
                     <div class="relative">
                         <input type="text"
                                x-model="query"
@@ -33,7 +33,7 @@
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="absolute mt-2 w-full bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50 overflow-hidden">
+                         class="absolute mt-2 w-full bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50 overflow-hidden max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:w-screen">
 
                         <template x-if="loading">
                             <div class="p-4 flex items-center justify-center">
