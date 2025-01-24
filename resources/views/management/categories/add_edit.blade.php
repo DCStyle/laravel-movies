@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', $category->exists ? 'Chỉnh sửa danh mục: ' . $category->name : 'Thêm danh mục mới')
 @section('header', $category->exists ? 'Chỉnh sửa danh mục: ' . $category->name : 'Thêm danh mục mới')

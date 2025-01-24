@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', 'Quản lý Menu')
 @section('header', 'Quản lý Menu')

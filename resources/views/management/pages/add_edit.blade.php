@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', $page->exists ? 'Chỉnh sửa trang: ' . $page->title : 'Thêm trang mới')
 @section('header', $page->exists ? 'Chỉnh sửa trang: ' . $page->title : 'Thêm trang mới')

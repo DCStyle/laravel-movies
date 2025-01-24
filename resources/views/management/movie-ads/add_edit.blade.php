@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', $movieAd->exists ? 'Chỉnh sửa quảng cáo: ' . $movieAd->name : 'Thêm quảng cáo mới')
 @section('header', $movieAd->exists ? 'Chỉnh sửa quảng cáo: ' . $movieAd->name : 'Thêm quảng cáo mới')

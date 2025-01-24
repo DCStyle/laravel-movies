@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(auth()->user()->hasRole('admin') ? 'layouts.admin' : 'layouts.moderator')
 
 @section('title', $article->exists ? 'Chỉnh sửa bài viết: ' . $article->title : 'Thêm bài viết mới')
 @section('header', $article->exists ? 'Chỉnh sửa bài viết: ' . $article->title : 'Thêm bài viết mới')
