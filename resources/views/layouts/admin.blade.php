@@ -42,6 +42,11 @@
                 <i class="fas fa-history mr-2"></i> Lịch sử hoạt động
             </a>
 
+            <a href="{{ route('admin.genres.index') }}"
+               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.genres.*') ? 'bg-gray-700' : '' }}">
+                <i class="fas fa-tags mr-2"></i> Thể loại
+            </a>
+
             @include('includes.menu_management')
 
             <!-- Logout Form -->

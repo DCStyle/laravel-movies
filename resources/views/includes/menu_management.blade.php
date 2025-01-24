@@ -2,10 +2,6 @@
    class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.articles.*') ? 'bg-gray-700' : '' }}">
     <i class="fas fa-newspaper mr-2"></i> Tin tức
 </a>
-<a href="{{ route('admin.genres.index') }}"
-   class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.genres.*') ? 'bg-gray-700' : '' }}">
-    <i class="fas fa-tags mr-2"></i> Thể loại
-</a>
 <a href="{{ route('management.categories.index') }}"
    class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700' : '' }}">
     <i class="fas fa-folder mr-2"></i> Danh mục
