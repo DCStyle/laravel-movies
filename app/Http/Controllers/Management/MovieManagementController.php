@@ -37,7 +37,7 @@ class MovieManagementController extends Controller
 
     public function create()
     {
-        return view('movies.management.add_edit', [
+        return view('management.movies.add_edit', [
             'isEdit' => false,
             'genres' => Genre::all(),
             'categories' => Category::all(),
