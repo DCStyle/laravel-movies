@@ -2,23 +2,23 @@
 
 require __DIR__.'/auth.php';
 
-use App\Http\Controllers\Admin\AdController;
-use App\Http\Controllers\Admin\ArticleController;
-use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EpisodeController;
-use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\GenreController;
-use App\Http\Controllers\Admin\MenuController;
-use App\Http\Controllers\Admin\MovieAdController;
-use App\Http\Controllers\Admin\PageController;
-use App\Http\Controllers\Admin\SeasonController;
-use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\Management\AdController;
+use App\Http\Controllers\Management\ArticleController;
+use App\Http\Controllers\Management\CategoryController;
+use App\Http\Controllers\Management\EpisodeController;
+use App\Http\Controllers\Management\FooterController;
+use App\Http\Controllers\Management\MenuController;
+use App\Http\Controllers\Management\MovieAdController;
+use App\Http\Controllers\Management\MovieManagementController;
+use App\Http\Controllers\Management\PageController;
+use App\Http\Controllers\Management\SeasonController;
+use App\Http\Controllers\Management\SettingsController;
 use App\Http\Controllers\MovieController;
-use App\Http\Controllers\MovieManagementController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,8 +40,8 @@ Route::middleware('auth')->group(function () {
 });
 
 // Movies Management Routes
-Route::middleware(['auth', 'role:admin|mod'])->group(function () {
-    Route::prefix('movies/management')->name('movies.management.')->controller(MovieManagementController::class)->group(function () {
+Route::middleware(['auth', 'role:admin|mod'])->prefix('management')->name('management.')->group(function () {
+    Route::prefix('movies')->name('movies.')->controller(MovieManagementController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -65,24 +65,12 @@ Route::middleware(['auth', 'role:admin|mod'])->group(function () {
         Route::put('/{episode}', [EpisodeController::class, 'update'])->name('update');
         Route::delete('/{episode}', [EpisodeController::class, 'destroy'])->name('destroy');
     });
-});
-
-// Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Redirect to Dashboard
-    Route::redirect('/', '/admin/dashboard');
-
-    // Article Management
-    Route::resource('articles', ArticleController::class);
-
-    // Genres Management
-    Route::resource('genres', GenreController::class);
 
     // Categories Management
     Route::resource('categories', CategoryController::class);
+
+    // Article Management
+    Route::resource('articles', ArticleController::class);
 
     // Settings
     Route::controller(SettingsController::class)->group(function () {
@@ -90,20 +78,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::put('/settings', 'update')->name('settings.update');
     });
 
-    // Users Management
-    Route::get('users/activity', [UserController::class, 'activity'])->name('users.activity');
-    Route::resource('users', UserController::class);
-
-    // Menu Management
-    Route::resource('menus', MenuController::class)->except(['show']);
-    Route::post('menus/reorder', [MenuController::class, 'reorder'])->name('menus.reorder');
+    // Ads Management
+    Route::resource('ads', AdController::class)->except(['show']);
+    Route::post('ads/reorder', [AdController::class, 'reorder'])->name('ads.reorder');
 
     // Pages Management
     Route::resource('pages', PageController::class)->except(['show']);
 
-    // Ads Management
-    Route::resource('ads', AdController::class)->except(['show']);
-    Route::post('ads/reorder', [AdController::class, 'reorder'])->name('ads.reorder');
+    // Menu Management
+    Route::resource('menus', MenuController::class)->except(['show']);
+    Route::post('menus/reorder', [MenuController::class, 'reorder'])->name('menus.reorder');
 
     // Movie Ads Management
     Route::resource('movie-ads', MovieAdController::class);
@@ -126,6 +110,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/update', 'updateFooter')->name('update');
         Route::delete('/delete', 'deleteFooter')->name('delete');
     });
+});
+
+// Admin Routes
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Redirect to Dashboard
+    Route::redirect('/', '/admin/dashboard');
+
+    // Genres Management
+    Route::resource('genres', GenreController::class);
+
+    // Users Management
+    Route::get('users/activity', [UserController::class, 'activity'])->name('users.activity');
+    Route::resource('users', UserController::class);
 });
 
 // Moderator Routes

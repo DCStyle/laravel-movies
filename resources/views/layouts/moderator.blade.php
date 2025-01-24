@@ -31,10 +31,8 @@
                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('mod.dashboard') ? 'bg-gray-700' : '' }}">
                 <i class="fas fa-tachometer-alt mr-2"></i> Tổng quan
             </a>
-            <a href="{{ route('movies.management.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('movies.management.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-film mr-2"></i> Phim
-            </a>
+
+            @include('includes.menu_management')
 
             <!-- Logout Form -->
             <form method="POST" action="{{ route('logout') }}" class="mt-4 px-4">

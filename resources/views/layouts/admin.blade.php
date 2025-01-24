@@ -31,54 +31,18 @@
                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
                 <i class="fas fa-tachometer-alt mr-2"></i> Tổng quan
             </a>
-            <a href="{{ route('admin.articles.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.articles.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-newspaper mr-2"></i> Tin tức
-            </a>
-            <a href="{{ route('admin.genres.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.genres.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-tags mr-2"></i> Thể loại
-            </a>
-            <a href="{{ route('admin.categories.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.categories.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-folder mr-2"></i> Danh mục
-            </a>
-            <a href="{{ route('movies.management.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('movies.management.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-film mr-2"></i> Phim
-            </a>
-            <a href="{{ route('admin.settings') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.settings') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-cogs mr-2"></i> Cài đặt
-            </a>
+
             <a href="{{ route('admin.users.index') }}"
                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.users.index', 'admin.users.create', 'admin.users.edit', 'admin.users.show') ? 'bg-gray-700' : '' }}">
                 <i class="fas fa-users mr-2"></i> Quản lý người dùng
             </a>
+
             <a href="{{ route('admin.users.activity') }}"
                class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.users.activity') ? 'bg-gray-700' : '' }}">
                 <i class="fas fa-history mr-2"></i> Lịch sử hoạt động
             </a>
-            <a href="{{ route('admin.menus.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.menus.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-bars mr-2"></i> Menu
-            </a>
-            <a href="{{ route('admin.pages.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.pages.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-pager mr-2"></i> Các trang
-            </a>
-            <a href="{{ route('admin.ads.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.ads.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-ad mr-2"></i> Quảng cáo
-            </a>
-            <a href="{{ route('admin.movie-ads.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.movie-ads.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-tachometer-alt-average mr-2"></i> Quảng cáo trong phim
-            </a>
-            <a href="{{ route('admin.footer.index') }}"
-               class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.footer.*') ? 'bg-gray-700' : '' }}">
-                <i class="fas fa-th-large mr-2"></i> Footer
-            </a>
+
+            @include('includes.menu_management')
 
             <!-- Logout Form -->
             <form method="POST" action="{{ route('logout') }}" class="mt-4 px-4">

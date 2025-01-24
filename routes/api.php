@@ -1,10 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\MovieAdController;
 use App\Http\Controllers\Api\EpisodeController;
 use App\Http\Controllers\Api\SeasonController;
 use App\Http\Controllers\MovieController;
-use App\Models\MovieAd;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
