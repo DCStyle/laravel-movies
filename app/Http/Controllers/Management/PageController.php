@@ -45,7 +45,7 @@ class PageController extends Controller
 
     public function edit(Page $page)
     {
-        return view('admin.pages.add_edit', compact('page'));
+        return view('management.pages.add_edit', compact('page'));
     }
 
     public function update(Request $request, Page $page)

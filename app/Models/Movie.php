@@ -107,7 +107,7 @@ class Movie extends Model
         return new SEOData(
             title: $this->meta_title && $this->meta_title !== '' ? $this->meta_title : $this->title,
             description: $this->meta_description && $this->meta_description !== '' ? $this->meta_description : $this->description,
-            image: Storage::url($this->thumbnail),
+            image: $this->getThumbnail() ?? null,
             tags: explode(',', $this->meta_keywords)
         );
     }

@@ -44,6 +44,28 @@ class Article extends Model
         );
     }
 
+    public function thumbnail()
+    {
+        // First check if article has a direct image relationship
+        if ($this->images()->exists()) {
+            $firstImage = $this->images()->first();
+            if ($firstImage) {
+                return Storage::url($firstImage->path);
+            }
+        }
+
+        // If no direct image, try to extract from content
+        if ($this->content) {
+            preg_match('/<img.+src=[\'"](?P<src>.+?)[\'"].*>/i', $this->content, $matches);
+            if (!empty($matches['src'])) {
+                return $matches['src'];
+            }
+        }
+
+        // If no image found, return null
+        return null;
+    }
+
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable');

@@ -26,7 +26,9 @@
 					@if($videoId)
 						<div class="youtube-embed w-full h-full"
 							 data-plyr-provider="youtube"
-							 data-plyr-embed-id="{{ $videoId }}">
+							 data-plyr-embed-id="{{ $videoId }}"
+							 data-thumbnail="{{ $source->movie->getThumbnail() }}"
+						>
 						</div>
 					@endif
 					@break
@@ -34,8 +36,10 @@
 				@case('direct')
 					<video class="player-main w-full h-full"
 						   playsinline
-						   crossorigin="anonymous">
-						<source src="{{ $source->source_url }}" type="video/mp4" />
+						   crossorigin="anonymous"
+						   poster="{{ $source->movie->getThumbnail() }}"
+					>
+						<source src="{{ $source->source_url }}" type="video/mp4"/>
 					</video>
 					@break
 
