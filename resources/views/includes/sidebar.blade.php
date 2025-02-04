@@ -50,7 +50,7 @@
                    class="flex gap-3 group bg-[rgba(30,30,30,.9)] hover:bg-gray-800 rounded-lg overflow-hidden">
                     <!-- Thumbnail -->
                     <div class="w-16 h-24 shrink-0">
-                        <img src="{{ asset($article->thumbnail) ?? 'https://placehold.co/400' }}"
+                        <img src="{{ asset($article->getThumbnail()) ?? 'https://placehold.co/400' }}"
                              alt="{{ $article->title }}"
                              class="w-full h-full object-cover">
                     </div>
